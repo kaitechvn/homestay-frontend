@@ -1,0 +1,58 @@
+{
+    "login": {
+        "sign_in": "Sign in",
+        "username": "Username",
+        "username_placeholder": "Username",
+        "password": "Password",
+        "password_placeholder": "Password",
+        "log_in_now": "Log in",
+        "forgot_password": "Forgot password",
+        "no_account": "Don't have an account?",
+        "sign_up": "Sign up",
+        "or_continue_with": "Or continue with"
+    },
+    
+        "register": {
+            "sign_up": "Sign up",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "address": "Address",
+            "dob": "Date of Birth",
+            "next": "Next",
+            "username": "Username",
+            "email": "Email",
+            "phone": "Phone Number",
+            "password": "Password",
+            "confirmPassword": "Confirm Password",
+            "back": "Back",
+            "submit": "Submit"
+          },
+          "footer": {
+            "aboutUs": "About Us",
+            "aboutUsText": "We offer the best homestay experiences for travelers",
+            "privacyPolicy": "Privacy Policy",
+            "termsOfService": "Terms of Service",
+            "topPlaces": "Top Places",
+            "followUs": "Follow Us",
+            "subscribeTitle": "Subscribe to our newsletter",
+            "emailPlaceholder": "Enter your email",
+            "subscribe": "Subscribe",
+            "contactUs": "Contact Us",
+            "contactAddress": "The TTC Building, 19 Duy Tan St, Cau Giay Dist"
+          },
+          "errors": {
+            "username_blank": "Username can not be blank",
+            "password_blank": "Password can not be blank",
+            "password_invalid": "Password is invalid",
+            "email_blank": "Email can not be blank",
+            "email_invalid": "Email is invalid",
+            "phone_blank": "Phone number can not be blank",
+            "phone_invalid": "Phone number is invalid",
+            "phone_existed": "Phone number already existed",
+            "dob_blank": "Date of birth can not be blank",
+            "user_not_found": "User not found",
+            "user_existed": "Username has been already used",
+            "email_existed": "Email already exists"
+          }
+}
+  

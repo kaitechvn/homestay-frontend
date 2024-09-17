@@ -1,0 +1,56 @@
+{
+  "login": {
+      "sign_in": "Đăng nhập",
+      "username": "Tên đăng nhập",
+      "username_placeholder": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "password_placeholder": "Mật khẩu",
+      "log_in_now": "Đăng nhập",
+      "forgot_password": "Quên mật khẩu",
+      "no_account": "Chưa có tài khoản?",
+      "sign_up": "Đăng ký",
+      "or_continue_with": "Hoặc tiếp tục với"
+  },
+  "register": {
+    "sign_up":"Đăng ký",
+    "firstName": "Họ",
+    "lastName": "Tên",
+    "address": "Địa chỉ",
+    "dob": "Ngày sinh",
+    "next": "Tiếp theo",
+    "username": "Tên đăng nhập",
+    "email": "Email",
+    "phoneNumber": "Số điện thoại",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "back": "Quay lại",
+    "submit": "Gửi"
+  },
+  "footer": {
+    "aboutUs": "Về Chúng Tôi",
+    "aboutUsText": "Chúng tôi cung cấp những trải nghiệm homestay tốt nhất cho du khách",
+    "privacyPolicy": "Chính Sách Bảo Mật",
+    "termsOfService": "Điều Khoản Dịch Vụ",
+    "topPlaces": "top Địa điểm",
+   "followUs": "Theo Dõi Chúng Tôi",
+    "subscribeTitle": "Đăng Ký Nhận Tin tức",
+    "emailPlaceholder": "Nhập email của bạn",
+    "subscribe": "Đăng Ký",
+    "contactUs": "Liên Hệ ",
+    "contactAddress": "Tòa Nhà TTC, 19 Phố Duy Tân, Quận Cầu Giấy"
+  },
+  "errors" : {
+    "username_blank": "Tên người dùng không được để trống",
+  "password_blank": "Mật khẩu không được để trống",
+  "password_invalid": "Mật khẩu không hợp lệ",
+  "email_blank": "Email không được để trống",
+  "email_invalid": "Email không hợp lệ",
+  "phone_blank": "Số điện thoại không được để trống",
+  "phone_invalid": "Số điện thoại không hợp lệ",
+  "phone_existed": "Số điện thoại đã tồn tại",
+  "dob_blank": "Ngày sinh không được để trống",
+  "user_not_found": "Người dùng không tìm thấy",
+  "user_existed": "Tên người dùng đã được sử dụng",
+  "email_existed": "Email đã tồn tại"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "login": {
+    "sign_in": "サインイン",
+    "username": "メール",
+    "username_placeholder": "name@example.com",
+    "password": "パスワード",
+    "password_placeholder": "パスワード",
+    "log_in_now": "ログイン",
+    "forgot_password": "パスワードを忘れましたか",
+    "no_account": "アカウントをお持ちではありませんか？",
+    "sign_up": "サインアップ",
+    "or_continue_with": "または以下で続ける"
+  }
+}
