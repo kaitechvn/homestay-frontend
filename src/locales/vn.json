@@ -52,5 +52,50 @@
   "user_not_found": "Người dùng không tìm thấy",
   "user_existed": "Tên người dùng đã được sử dụng",
   "email_existed": "Email đã tồn tại"
-  }
-}
+  },
+  "admin-navbar": {
+      "dashboard": "Bảng ",
+      "users": "Người dùng",
+      "homestays": "Homestay",
+      "bookings": "Đơn đặt",
+      "reports": "Báo cáo",
+      "settings": "Cài đặt",
+      "payment": "Thanh toán",
+      "profile": "Hồ sơ",
+      "logout": "Đăng xuất"
+    },
+    
+      "user-management": {
+        "title": "Quản Lý Người Dùng",
+        "username": "Tên Đăng Nhập",
+        "password": "Mật Khẩu",
+        "fullname": "Họ Tên",
+        "email": "Email",
+        "phone": "Số Điện Thoại",
+        "address": "Địa Chỉ",
+        "dateOfBirth": "Ngày Sinh",
+        "status": {
+          "title": "Trạng Thái",
+          "active": "Hoạt Động",
+          "inactive": "Tạm Ngưng"
+        },
+        "role": "Vai Trò",
+        "actions": "Hành Động",
+        "addUser": "Thêm Người Dùng",
+        "editUser": "Chỉnh Sửa Người Dùng",
+        "update": "Cập Nhật",
+        "cancel": "Hủy",
+        "roles": {
+          "title": "Vai Trò",
+          "admin": "Quản Trị Viên",
+          "user": "Người Dùng"
+        },
+        "add": "Thêm"
+      },
+      "messages": {
+        "add-success": "Tạo thành công",
+        "update-sucess": "Cập nhật thành công",
+        "delete-success": "Xóa thành công"
+      }
+    }
+    

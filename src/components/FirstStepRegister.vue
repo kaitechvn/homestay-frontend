@@ -16,7 +16,7 @@
         <div class="col-12">
           <div class="form-floating mb-2">
             <input v-model="form.address" type="text" class="form-control" :placeholder="$t('register.address')" />
-            <label>{{ $t('register.address') }}</label>
+          <label>{{ $t('register.address') }}</label>
           </div>
         </div>
         <div class="col-12">

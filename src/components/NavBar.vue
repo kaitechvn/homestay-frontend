@@ -17,76 +17,116 @@
             <router-link class="nav-link mx-2" to="/homestay">Homestay</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link mx-2" to="/about-us">About Us</router-link>
+            <router-link class="nav-link mx-2" to="/booking">Booking</router-link>
           </li>
           <li class="nav-item d-none d-lg-block">
             <router-link class="nav-link mx-2" to="/">
               <img src="@/assets/logo-navbar.png" height="70" />
             </router-link>
           </li>
-          <li class="nav-item">
+         <!-- Conditionally render links based on user authentication status -->
+         <li v-if="!isLoggedIn" class="nav-item">
             <router-link class="nav-link mx-2" to="/login">Sign In</router-link>
           </li>
-          <li class="nav-item">
+          <li v-if="!isLoggedIn" class="nav-item">
             <router-link class="nav-link mx-2" to="/register">Sign Up</router-link>
           </li>
+          <li v-if="isLoggedIn" class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle mx-2" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="@/assets/ava-logo.jpg" height="30" class="rounded-circle profile-icon" /> <!-- Profile Icon -->
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+              <li>
+                <router-link class="dropdown-item" to="/profile">Profile</router-link>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" @click.prevent="logout">Logout</a>
+              </li>
+            </ul>
+          </li>
         </ul>
-        <ul class="navbar-nav ms-auto"> <!-- Ensure it's aligned to the right -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle mx-2" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span :class="currentFlag"></span> <!-- Default Flag Icon -->
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-            <li>
-              <a class="dropdown-item" href="#" @click.prevent="switchLanguage('en', 'fi fi-us')">
-                <span class="fi fi-us"></span> English
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#" @click.prevent="switchLanguage('vn', 'fi fi-vn')">
-                <span class="fi fi-vn"></span> Tiếng Việt
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#" @click.prevent="switchLanguage('ja', 'fi fi-jp')">
-                <span class="fi fi-jp"></span> 日本語
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item mx-2">
+            <router-link class="nav-link host-bar" :to="hostLink" @click="handleHostClick">{{ hostText }}</router-link>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle mx-2" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span :class="currentFlag"></span> <!-- Default Flag Icon -->
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+              <li>
+                <a class="dropdown-item" href="#" @click.prevent="switchLanguage('en', 'fi fi-us')">
+                  <span class="fi fi-us"></span> English
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" @click.prevent="switchLanguage('vn', 'fi fi-vn')">
+                  <span class="fi fi-vn"></span> Tiếng Việt
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" @click.prevent="switchLanguage('ja', 'fi fi-jp')">
+                  <span class="fi fi-jp"></span> 日本語
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-
-import { onMounted, ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/authStore';
+import PAGES from '@/constants/pages';
 
-// Use vue-i18n
 const { locale } = useI18n();
+const authStore = useAuthStore();
+const currentFlag = ref('fi fi-us'); 
+const isLoggedIn = computed(() => authStore.isAuthenticated);
+const currentMode = computed(() => authStore.mode);
 
-// Reactive flag to update the current flag dynamically
-const currentFlag = ref('fi fi-us'); // Default to English (US)
+// Computed properties for link and text
+const hostLink = computed(() => {
+  if (!isLoggedIn.value) return PAGES.LOGIN;
+  return currentMode.value;
+});
+
+const hostText = computed(() => {
+  if (!isLoggedIn.value) return 'Host';
+  return currentMode.value === PAGES.HOME ? 'Switch to hosting' : 'Switch to travelling';
+});
+
+// Function to toggle the mode
+function handleHostClick() {
+  if (isLoggedIn.value) {
+    authStore.toggleMode();
+  }
+}
 
 // Function to switch language and update flag icon
 function switchLanguage(lang, flagClass) {
   locale.value = lang; 
   currentFlag.value = flagClass;
-  
-  // Update the flag icon
   localStorage.setItem('selectedLanguage', lang);
   localStorage.setItem('selectedFlag', flagClass);
 }
 
+// Function to handle user logout
+function logout() {
+  authStore.logout();
+}
+
+// Function to initialize local storage values
 function initializeLocalStorage() {
   if (!localStorage.getItem('selectedLanguage')) {
-    localStorage.setItem('selectedLanguage', 'en'); // Default language
+    localStorage.setItem('selectedLanguage', 'en'); 
   }
   if (!localStorage.getItem('selectedFlag')) {
-    localStorage.setItem('selectedFlag', 'fi fi-us'); // Default flag
+    localStorage.setItem('selectedFlag', 'fi fi-us'); 
   }
 }
 
@@ -101,6 +141,17 @@ onMounted(() => {
   }
   if (savedFlag) {
     currentFlag.value = savedFlag;
+  }
+
+  // Ensure that the user's role and mode are initialized from local storage
+  const savedRole = localStorage.getItem('userRole');
+  if (savedRole) {
+    authStore.userRole = savedRole;
+  }
+
+  const savedMode = localStorage.getItem('mode');
+  if (savedMode) {
+    authStore.mode = savedMode;
   }
 });
 </script>
@@ -122,4 +173,16 @@ onMounted(() => {
   align-items: center;
 }
 
+
+.dropdown-menu {
+  min-width: 150px; /* Adjust the width as needed */
+}
+
+.rounded-circle {
+  border-radius: 50%;
+}
+
+.profile-icon {
+  margin-left: 10px; /* Adjust margin to move icon to the right */
+}
 </style>

@@ -12,7 +12,7 @@
         "or_continue_with": "Or continue with"
     },
     
-        "register": {
+      "register": {
             "sign_up": "Sign up",
             "firstName": "First Name",
             "lastName": "Last Name",
@@ -27,7 +27,7 @@
             "back": "Back",
             "submit": "Submit"
           },
-          "footer": {
+      "footer": {
             "aboutUs": "About Us",
             "aboutUsText": "We offer the best homestay experiences for travelers",
             "privacyPolicy": "Privacy Policy",
@@ -40,7 +40,7 @@
             "contactUs": "Contact Us",
             "contactAddress": "The TTC Building, 19 Duy Tan St, Cau Giay Dist"
           },
-          "errors": {
+      "errors": {
             "username_blank": "Username can not be blank",
             "password_blank": "Password can not be blank",
             "password_invalid": "Password is invalid",
@@ -53,6 +53,55 @@
             "user_not_found": "User not found",
             "user_existed": "Username has been already used",
             "email_existed": "Email already exists"
+          },
+          
+        "admin-navbar": {
+              "dashboard": "Dashboard",
+              "users": "User",
+              "homestays": "Homestay",
+              "bookings": "Booking",
+              "reports": "Report",
+              "payment": "Payment",
+              "settings": "Setting",
+              "profile": "Profile",
+              "logout": "Logout"
+            },
+        
+          "user-management": {
+            "title": "User Management",
+            "username": "Username",
+            "password": "Password",
+            "fullname": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "address": "Address",
+            "dateOfBirth": "Date of Birth",
+            "status": {
+              "title" : "Status",
+              "active": "Active",
+              "inactive": "Inactive"
+            },
+            "role": "Role",
+            "actions": "Actions",
+            "addUser": "Add User",
+            "editUser": "Edit User",
+            "update": "Update",
+            "cancel": "Cancel",
+            "roles": {
+              "title": "Role",
+              "admin": "Admin",
+              "user": "User"
+            },
+            "add" : "Add"
+          },
+          "messages" : {
+            "add-success": "Created successfully",
+            "update-sucess": "Updated successfully",
+            "delete-success": "Deleted successfully"
           }
-}
+        }
+          
+              
+      
+
   

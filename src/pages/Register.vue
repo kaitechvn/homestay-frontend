@@ -43,9 +43,9 @@ import SecondStepRegister from '@/components/SecondStepRegister.vue';
 import axiosInstance from '@/plugins/axios';
 
 const { t } = useI18n();
-const router = useRouter(); // Initialize useRouter
+const router = useRouter(); 
 const errorMessage = ref('');
-const successMessage = ref(''); // Add successMessage ref
+const successMessage = ref(''); 
 const step = ref(1);
 const form = ref({
   firstName: '',
@@ -95,3 +95,4 @@ async function submitForm() {
   background-color: #ffbc70e1;
 }
 </style>
+

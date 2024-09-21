@@ -1,3 +1,4 @@
+import PAGES from "@/constants/pages";
 import axiosInstance from "@/plugins/axios";
 import routers from "@/routers";
 
@@ -21,7 +22,6 @@ axiosInstance.interceptors.response.use(
                 console.log("New access token: ", response.data.accessToken);
                 localStorage.setItem("access_token", response.data.accessToken);
 
-                // Retry the original request with the new access token
                 const { config } = error;
                 config.headers.Authorization = `Bearer ${response.data.access_token}`;
                 return axiosInstance.request(config);
@@ -34,7 +34,7 @@ axiosInstance.interceptors.response.use(
                     localStorage.removeItem("refresh-token");
 
                     await routers.push({
-                        path: "/login",
+                        path: PAGES.LOGIN,
                         query: { sessionExpired: true},
                     });
                 }
