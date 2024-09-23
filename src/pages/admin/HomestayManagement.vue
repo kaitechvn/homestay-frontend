@@ -136,17 +136,32 @@
         <h2>{{ $t("homestay-management.imagesTitle") }}</h2>
         <div class="image-list">
           <div
-            v-for="(imageUrl, index) in images"
-            :key="index"
+            v-for="image in images"
+            :key="image.id"
             class="image-container"
           >
-            <img :src="imageUrl" class="homestay-image" alt="Homestay Image" />
+            <img
+             :src="image.url" class="homestay-image" 
+             alt="Homestay Image"
+             @click="openImgDetail(imageUrl)"
+             />
             <button
-              @click="deleteImage(imageUrl)"
+              @click="deleteImage(image.id)"
               class="btn btn-danger btn-sm delete-button"
             >
               <i class="fas fa-trash-alt"></i>
             </button>
+          </div>
+          <!-- Modal for showing large image -->
+          <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
+            <div class="modal-content" @click.stop>
+              <span class="close-button" @click="closeImgDetail">&times;</span>
+              <img
+                :src="modalImage"
+                alt="Large homestay image"
+                class="modal-image"
+              />
+            </div>
           </div>
         </div>
         <form @submit.prevent="uploadImages">
@@ -257,9 +272,13 @@ const openImageModal = async (homestay) => {
   loadHomestayImages(homestay);
 
   // Get the images and format them
-  images.value = (await getImagesForHomestay(homestay.id)).map(
-    (imageUrl) => `${import.meta.env.VITE_SERVER_URL}/api/homestays/${imageUrl}`
-  );
+  const imagesFromBackend = await getImagesForHomestay(homestay.id);
+
+  images.value = imagesFromBackend.map((image) => ({
+    id: image.id,
+    url: image.url // Directly using the URL from the backend
+  }));
+
   console.log(images.value);
 };
 
@@ -272,29 +291,7 @@ const uploadImages = async () => {
     await uploadHomestayImages(selectedHomestay.value.id, selectedFiles.value);
     successMessage.value = t("messages.upload-success");
 
-    const currentPage = homestayStore.currentPage;
-    await homestayStore.loadHomestays(currentPage, 5);
-
-    const updatedHomestay = homestayStore.homestays.find(
-      (h) => h.id === selectedHomestay.value.id
-    );
-
-    console.log("Updated Homestay:", updatedHomestay); // Log to see the updated homestay
-    if (updatedHomestay) {
-      selectedHomestay.value = updatedHomestay;
-
-      // Log the images to verify
-      console.log("New Homestay Images:", updatedHomestay.images);
-
-      // Set images directly from updated homestay
-      images.value = updatedHomestay.images.map(
-        (imageUrl) =>
-          `${import.meta.env.VITE_SERVER_URL}/api/homestays/${imageUrl}`
-      );
-
-      // Log the updated images to verify
-      console.log("Updated Images:", images.value);
-    }
+    await reloadHomestayImages(selectedHomestay.value.id); // Reload images after upload
 
     selectedFiles.value = [];
     fileInput.value.value = ""; // Reset the input element
@@ -307,18 +304,61 @@ const formatBedBath = (bedrooms, bathrooms) => {
   return `${bedrooms}-${bathrooms}`;
 };
 
-const deleteImage = async (imageUrl) => {
+const deleteImage = async (imageId) => {
   try {
-    await deleteHomestayImage(selectedHomestay.value.id, imageUrl);
+    await deleteHomestayImage(selectedHomestay.value.id, imageId);
     successMessage.value = t("messages.image-delete-success");
-    images.value = await getImagesForHomestay(selectedHomestay.value.id);
+
+    await reloadHomestayImages(selectedHomestay.value.id); 
+
   } catch (error) {
     console.error(error);
+    errorMessage.value = t("messages.image-delete-fail");
   }
 };
 
 const closeImageModal = () => {
   showImageModal.value = false;
+};
+
+const reloadHomestayImages = async (homestayId) => {
+  const currentPage = homestayStore.currentPage;
+  await homestayStore.loadHomestays(currentPage, 5);
+
+  const updatedHomestay = homestayStore.homestays.find(
+    (h) => h.id === homestayId
+  );
+
+  console.log("Updated Homestay:", updatedHomestay); // Log to see the updated homestay
+  if (updatedHomestay) {
+    selectedHomestay.value = updatedHomestay;
+
+    // Log the images to verify
+    console.log("New Homestay Images:", updatedHomestay.images);
+
+    // Update images array
+    images.value = updatedHomestay.images.map((image) => ({
+      id: image.id, 
+      url: image.url 
+    }));
+
+    console.log("Updated Images:", images.value);
+  }
+};
+
+const isModalOpen = ref(false); // Controls modal visibility
+const modalImage = ref(""); // Stores the image URL to display in the modal
+
+// Method to open the modal and display the selected image
+const openImgDetail = (imageUrl) => {
+  modalImage.value = imageUrl; // Set the clicked image as the modal image
+  isModalOpen.value = true; // Show the modal
+};
+
+// Method to close the modal
+const closeImgDetail = () => {
+  isModalOpen.value = false; // Hide the modal
+  modalImage.value = ""; // Clear the modal image
 };
 
 onMounted(async () => {
@@ -499,6 +539,28 @@ onMounted(async () => {
 
 .image-container:hover .delete-button {
   display: block; /* Show button on hover */
+}
+
+.modal-image {
+  width: 550px;
+  height: 320px;  /* Increase height limit to allow more vertical space */
+  display: block;
+  margin: 0 auto;    /* Center the image horizontally */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #ff0000; /* Red color on hover */
 }
 
 @keyframes fadeIn {

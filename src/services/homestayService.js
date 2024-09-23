@@ -32,9 +32,8 @@ export const uploadImages = (homestayId, files) => {
   });
 };
 
-export const deleteImage = (homestayId, imageId) => {
-  return axiosInstance.delete(`${API_HOMESTAY}/${homestayId}/images/${imageId}`);
+export const deleteImage = (homestayId, imageUrl) => {
+  return axiosInstance.delete(`${API_HOMESTAY}/${homestayId}/images/${imageUrl}`);
 };
 
-
-
+  

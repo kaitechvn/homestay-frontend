@@ -38,8 +38,8 @@
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router'; // Import useRouter
-import FirstStepRegister from '@/components/FirstStepRegister.vue';
-import SecondStepRegister from '@/components/SecondStepRegister.vue';  
+import FirstStepRegister from '@/components/register/FirstStepRegister.vue';
+import SecondStepRegister from '@/components/register/SecondStepRegister.vue';  
 import axiosInstance from '@/plugins/axios';
 
 const { t } = useI18n();

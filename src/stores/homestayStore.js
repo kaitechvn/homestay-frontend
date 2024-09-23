@@ -71,7 +71,7 @@ export const useHomestayStore = defineStore('homestay', {
     },
 
     getImagesForHomestay(homestayId) {
-      return this.homestayImages[homestayId] || []; // Return empty array if no images
+      return this.homestayImages[homestayId] || []; 
     },
 
     async uploadHomestayImages(homestayId, files) {
@@ -82,16 +82,14 @@ export const useHomestayStore = defineStore('homestay', {
         });
 
         await uploadImages(homestayId, formData);
-        this.loadHomestayImages({ id: homestayId, images: await this.getImagesForHomestay(homestayId) }); // Reload images after upload
       } catch (error) {
         console.error('Failed to upload images:', error);
       }
     },
 
-    async deleteHomestayImage(homestayId, imageId) {
+    async deleteHomestayImage(homestayId, imageUrl) {
       try {
-        await deleteImage(homestayId, imageId);
-        this.loadHomestayImages({ id: homestayId, images: await this.getImagesForHomestay(homestayId) }); // Reload images after deletion
+        await deleteImage(homestayId, imageUrl);
       } catch (error) {
         console.error('Failed to delete image:', error);
       }
