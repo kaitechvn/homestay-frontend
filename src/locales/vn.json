@@ -92,6 +92,28 @@
         },
         "add": "Thêm"
       },
+      "homestay-management": {
+        "title": "Quản lý Homestay",
+        "addHomestay": "Thêm Homestay",
+        "editHomestay": "Chỉnh sửa Homestay",
+        "name": "Tên",
+        "description": "Mô tả",
+        "phone": "Số điện thoại",
+        "district": "Quận",
+        "address": "Địa chỉ",
+        "status": "Trạng thái",
+        "guest": "Số khách",
+        "price": "Giá",
+        "bed-bath": "PN/PT",
+        "rating": "Điểm ĐG",
+        "reviewCount": "Số ĐG",
+        "actions": "Hành động",
+        "update": "Cập nhật",
+        "add": "Thêm",
+        "cancel": "Hủy bỏ",
+        "imagesTitle": "Hình ảnh của {{name}}",
+        "uploadImages": "Tải lên hình ảnh"
+      },
       "messages": {
         "add-success": "Tạo thành công",
         "update-sucess": "Cập nhật thành công",

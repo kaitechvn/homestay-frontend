@@ -20,24 +20,21 @@ export const deleteHomestay = (homestayId) => {
   return axiosInstance.delete(`${API_HOMESTAY}/${homestayId}`);
 };
 
-export const fetchHomestayImages = (homestayId) => {
-  return axiosInstance.get(`${API_HOMESTAY}/${homestayId}/images`);
+export const uploadImages = (homestayId, files) => {
+  const formData = new FormData();
+  files.forEach(file => {
+    formData.append('image', file);
+  });
+  return axiosInstance.post(`${API_HOMESTAY}/${homestayId}/images`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
 };
 
-export const uploadHomestayImages = (homestayId, files) => {
-    const formData = new FormData();
-    
-    files.forEach((file) => {
-      formData.append('images', file); // 'images' is the key; adjust if necessary
-    });
-  
-    return axiosInstance.post(`${API_HOMESTAY}/${homestayId}/images`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-  };
-
-export const deleteHomestayImage = (homestayId, imageId) => {
+export const deleteImage = (homestayId, imageId) => {
   return axiosInstance.delete(`${API_HOMESTAY}/${homestayId}/images/${imageId}`);
 };
+
+
+

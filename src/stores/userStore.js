@@ -12,14 +12,12 @@ export const useUserStore = defineStore('user', {
     async loadUsers(page = 1, size = 5) {
         try {
           const response = await fetchUsers(page, size);
-          console.log(response.data);
+          console.log(response.data); // Log the response for debugging
       
           // Extract users and pagination info
           this.users = [...response.data.data.data]; 
           this.currentPage = response.data.data.currentPage;
           this.totalPages = response.data.data.totalPages;
-          this.pageSize = response.data.data.pageSize;
-          this.totalElements = response.data.data.totalElements;
         } catch (error) {
           console.error('Failed to fetch users:', error);
         }
@@ -27,7 +25,7 @@ export const useUserStore = defineStore('user', {
     async addUser(userData) {
       try {
         await createUser(userData);
-        this.loadUsers(this.currentPage);
+        this.loadUsers(this.currentPage); // Refresh list after adding
       } catch (error) {
         console.error('Failed to create user:', error);
       }

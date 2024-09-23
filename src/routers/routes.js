@@ -9,8 +9,7 @@ import { adminGuard } from "./guards";
 import Dashboard from "@/pages/admin/Dashboard.vue";
 import UserManagement from "@/pages/admin/UserManagement.vue";
 import Message from "@/pages/admin/Message.vue";
-
-
+import HomestayManagement from "@/pages/admin/HomestayManagement.vue";
 
 const routes = [
   // General routes
@@ -25,6 +24,7 @@ const routes = [
     children: [
       { path: PAGES.ADMIN.DASHBOARD, component: Dashboard },
       { path: PAGES.ADMIN.USER_MANAGEMENT, component: UserManagement },
+      { path: PAGES.ADMIN.HOMESTAY_MANAGEMENT, component: HomestayManagement},
       { path: PAGES.ADMIN.MESSAGE, component: Message} 
     ],
   },

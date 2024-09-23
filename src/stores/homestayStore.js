@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchHomestays, createHomestay, updateHomestay, deleteHomestay } from '@/services/homestayService';
+import { fetchHomestays, createHomestay, updateHomestay, deleteHomestay, uploadImages, deleteImage} from '@/services/homestayService';
 
 export const useHomestayStore = defineStore('homestay', {
   state: () => ({
@@ -7,6 +7,7 @@ export const useHomestayStore = defineStore('homestay', {
     selectedHomestay: null,
     currentPage: 1,
     totalPages: 1,
+    homestayImages: {}, // Initialize to store images for each homestay
   }),
   actions: {
     async loadHomestays(page = 1, size = 5) {
@@ -34,7 +35,7 @@ export const useHomestayStore = defineStore('homestay', {
     async modifyHomestay(homestayId, homestayData) {
       try {
         await updateHomestay(homestayId, homestayData);
-        this.loadHomestays(this.currentPage); // Refresh list after updating
+        this.loadHomestays(this.currentPage); 
         this.selectedHomestay = null; // Clear selected homestay after update
       } catch (error) {
         console.error('Failed to update homestay:', error);
@@ -54,6 +55,47 @@ export const useHomestayStore = defineStore('homestay', {
     },
     clearSelectedHomestay() {
       this.selectedHomestay = null; // Clear the selected homestay details
+    },
+
+    loadHomestayImages(homestay) {
+      // Check if the homestay already has images
+      if (homestay.images && homestay.images.length > 0) {
+        // Store images directly from the homestay object
+        this.homestayImages[homestay.id] = homestay.images;
+        console.log(`Loaded images for homestay ${homestay.id}:`, this.homestayImages[homestay.id]);
+      } else {
+        // If no images, set to an empty array
+        this.homestayImages[homestay.id] = [];
+        console.log(`No images available for homestay ${homestay.id}.`);
+      }
+    },
+
+    getImagesForHomestay(homestayId) {
+      return this.homestayImages[homestayId] || []; // Return empty array if no images
+    },
+
+    async uploadHomestayImages(homestayId, files) {
+      try {
+        const formData = new FormData();
+        Array.from(files).forEach(file => {
+          formData.append('images', file);
+        });
+
+        await uploadImages(homestayId, formData);
+        this.loadHomestayImages({ id: homestayId, images: await this.getImagesForHomestay(homestayId) }); // Reload images after upload
+      } catch (error) {
+        console.error('Failed to upload images:', error);
+      }
+    },
+
+    async deleteHomestayImage(homestayId, imageId) {
+      try {
+        await deleteImage(homestayId, imageId);
+        this.loadHomestayImages({ id: homestayId, images: await this.getImagesForHomestay(homestayId) }); // Reload images after deletion
+      } catch (error) {
+        console.error('Failed to delete image:', error);
+      }
     }
+
   }
 });

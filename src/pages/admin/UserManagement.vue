@@ -2,17 +2,16 @@
   <div class="user-management">
     <div class="user-list">
       <div class="header-container">
-  <h2 class="header-title">{{ $t("user-management.title") }}</h2>
-  <div class="right-container">
-    <div class="success-message" v-if="successMessage">
-      {{ successMessage }}
-    </div>
-    <button @click="startCreatingUser" class="btn btn-primary">
-      {{ $t("user-management.addUser") }}
-    </button>
-  </div>
-</div>
-      <!-- Column Selector -->
+        <h2 class="header-title">{{ $t("user-management.title") }}</h2>
+        <div class="right-container">
+          <div class="success-message" v-if="successMessage">
+            {{ successMessage }}
+          </div>
+          <button @click="startCreatingUser" class="btn btn-primary">
+            {{ $t("user-management.addUser") }}
+          </button>
+        </div>
+      </div>
 
       <table class="table mt-3">
         <thead>
@@ -37,34 +36,34 @@
             <td class="text-center">{{ user.email }}</td>
             <td class="text-center">{{ user.phone }}</td>
             <td class="text-center">
-  <span
-    :class="{
-      'badge badge-active': user.status === 1,
-      'badge badge-inactive': user.status === 0,
-    }"
-  >
-    {{
-      user.status === 1
-        ? $t("user-management.status.active")
-        : $t("user-management.status.inactive")
-    }}
-  </span>
-</td>
+              <span
+                :class="{
+                  'badge badge-active': user.status === 1,
+                  'badge badge-inactive': user.status === 0,
+                }"
+              >
+                {{
+                  user.status === 1
+                    ? $t("user-management.status.active")
+                    : $t("user-management.status.inactive")
+                }}
+              </span>
+            </td>
 
-<td class="text-center">
-  <span
-    :class="{
-      'badge badge-admin': user.role == '1',
-      'badge badge-user': user.role == '2',
-    }"
-  >
-    {{
-      user.role == "1"
-        ? $t("user-management.roles.admin")
-        : $t("user-management.roles.user")
-    }}
-  </span>
-</td>
+            <td class="text-center">
+              <span
+                :class="{
+                  'badge badge-admin': user.role == '1',
+                  'badge badge-user': user.role == '2',
+                }"
+              >
+                {{
+                  user.role == "1"
+                    ? $t("user-management.roles.admin")
+                    : $t("user-management.roles.user")
+                }}
+              </span>
+            </td>
 
             <td class="text-center">
               <button
@@ -248,8 +247,6 @@ const users = computed(() => userStore.users);
 const selectedUser = computed(() => userStore.selectedUser);
 const currentPage = computed(() => userStore.currentPage);
 const totalPages = computed(() => userStore.totalPages);
-const showUsername = ref(true);
-const showDob = ref(true);
 
 const {
   loadUsers,
@@ -334,7 +331,7 @@ const deleteUser = async (userId) => {
 const hideSuccessMessage = () => {
   setTimeout(() => {
     successMessage.value = "";
-  }, 5000);
+  }, 1000);
 };
 
 const closeModal = () => {
@@ -512,7 +509,7 @@ onMounted(() => {
   padding: 10px;
   border-radius: 4px;
   margin-left: 10px; /* Add margin to the left for spacing */
-  animation: fadeIn 1s ease-out, fadeOut 2s ease-in 3s forwards; /* Add animation here */
+  animation: fadeIn 1s ease-out, fadeOut 2s ease-in 1s forwards; /* Add animation here */
 }
 
 .success-message::before {
