@@ -75,6 +75,7 @@ const goToNextPage = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 20px;
   gap: 10px;
 }
 

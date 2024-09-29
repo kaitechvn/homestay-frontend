@@ -9,6 +9,5 @@ export function adminGuard(to, from, next) {
     return next(PAGES.FORBIDDEN); // Assuming PAGES.FORBIDDEN maps to "/403"
   }
 
-  // If everything is okay, allow access to the route
   next();
 }

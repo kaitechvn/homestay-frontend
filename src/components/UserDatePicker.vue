@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="datepicker">
     <h3>Available Date</h3>
     <div class="calendar">
@@ -31,25 +31,21 @@
       </div>
     </div>
     <div class="button-container">
-      <button @click="lockDates" class="lock-button">Lock</button>
-      <button @click="unlockDates" class="unlock-button">Unlock</button>
-      <button @click="close" class="close-button">Close</button>
+      <button @click="checkIn" class="checkin-button">Check In</button>
+      <button @click="checkOut" class="checkout-button">Check Out</button>
     </div>
   </div>
 </template>
+  
+  <script setup>
+import { ref, computed } from "vue";
 
-
-<script setup>
-import { ref, computed} from "vue";
-import { useHomestayStore } from "@/stores/homestayAdminStore";
-
-const homestayStore = useHomestayStore();
-const emit = defineEmits(["select-dates", "close", "reopenDatePicker"]);
+const emit = defineEmits(["select-dates"]);
 
 const props = defineProps({
   lockedDates: {
     type: Array,
-    default: () => [], 
+    default: () => [],
   },
   homestayId: {
     type: Number,
@@ -58,8 +54,8 @@ const props = defineProps({
 });
 
 const currentDate = ref(new Date());
-const selectedDates = ref(new Set());
-const selectedUnlockDates = ref(new Set());
+const checkInDate = ref(null);
+const checkOutDate = ref(null);
 
 const monthNames = [
   "January",
@@ -122,29 +118,21 @@ const isDisabled = (day) => {
 
 const toggleDate = (day) => {
   if (day) {
-    const dateString = `${currentYear.value}-${(currentMonth.value + 1)
-      .toString()
-      .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
 
-    const isLockedDate = isDisabled(day).isLocked;
-
-    if (isLockedDate) {
-      // Toggle unlocking selection for locked dates
-      if (selectedUnlockDates.value.has(dateString)) {
-        selectedUnlockDates.value.delete(dateString);
-      } else {
-        selectedUnlockDates.value.add(dateString);
-      }
-    } else if (!isDisabled(day).isDisabled) {
-      // Toggle regular date selection
-      if (selectedDates.value.has(dateString)) {
-        selectedDates.value.delete(dateString);
-      } else {
-        selectedDates.value.add(dateString);
-      }
+    if (!checkInDate.value) {
+      // If check-in is not set, set it to the selected day
+      checkInDate.value = new Date(currentYear.value, currentMonth.value, day);
+    } else if (
+      !checkOutDate.value &&
+      new Date(currentYear.value, currentMonth.value, day) > checkInDate.value
+    ) {
+      // If check-out is not set and selected day is after check-in, set it to check-out
+      checkOutDate.value = new Date(currentYear.value, currentMonth.value, day);
+    } else {
+      // Reset check-in and check-out if the user selects a new check-in date
+      checkInDate.value = new Date(currentYear.value, currentMonth.value, day);
+      checkOutDate.value = null;
     }
-
-    emit("select-dates", Array.from(selectedDates.value));
   }
 };
 
@@ -160,36 +148,6 @@ const isSelected = (day) => {
     .toString()
     .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
   return selectedDates.value.has(dateString);
-};
-
-async function lockDates() {
-  try {
-    const datesToLock = Array.from(selectedDates.value);
-    await homestayStore.addLockDate(props.homestayId, datesToLock);
-    emit('reopenDatePicker'); // Emit to notify parent to reopen date picker
-
-    selectedDates.value.clear(); // Clear after locking
-  } catch (error) {
-    console.error("Failed to lock dates:", error);
-  }
-}
-
-// Remove
-const unlockDates = async () => {
-  try {
-    const datesToUnlock = Array.from(selectedUnlockDates.value); // Collect selected unlock dates into an array
-    if (datesToUnlock.length === 0) {
-      console.error("No dates selected to unlock."); // Check if any dates are selected
-      return; // Early return if no dates are selected
-    }
-    // Call the store method to remove the list of unlock dates
-    await homestayStore.removeLockDate(props.homestayId, datesToUnlock);
-    emit('reopenDatePicker'); // Emit to notify parent to reopen date picker
-
-    selectedUnlockDates.value.clear(); // Clear selected unlock dates after unlocking
-  } catch (error) {
-    console.error("Failed to unlock dates:", error); // Log any errors
-  }
 };
 
 const prevMonth = () => {
@@ -214,43 +172,41 @@ const close = () => {
   emit("close");
 };
 </script>
-
-
-<style scoped>
+  
+  <style scoped>
 .button-container {
-  display: flex; /* Use flexbox for inline alignment */
-  justify-content: space-between; /* Space between buttons */
-  align-items: center; /* Center align buttons vertically */
-  margin-top: 10px; /* Add some margin above the button container */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.lock-button,
-.unlock-button,
+.checkin-button,
+.checkout-button,
 .close-button {
-  background-color: #ff4d4d; /* Base color for all buttons */
+  background-color: #ff4d4d;
   color: white;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
-  margin-right: 10px; /* Add space between buttons */
-  flex: 1; /* Allow buttons to grow equally */
+  margin-right: 10px;
+  flex: 1;
 }
 
-.unlock-button {
-  background-color: #4caf50; /* Different color for unlock button */
+.checkin-button {
+  background-color: #4caf50;
 }
 
-.lock-button:hover,
-.unlock-button:hover,
+.checkin-button:hover,
+.checkout-button:hover,
 .close-button:hover {
-  opacity: 0.9; /* Slight opacity change on hover */
+  opacity: 0.9;
 }
 
 .close-button {
   margin-left: auto;
-  background-color: #949494; /* Different color for unlock button */
-  /* Push the close button to the right */
+  background-color: #949494;
 }
 
 .datepicker {
@@ -308,43 +264,37 @@ const close = () => {
 }
 
 .day.selected {
-  background-color: rgba(255, 99, 71, 0.5); /* Light red background */
-  border: 2px solid #ab4736; /* Tomato red border */
-  border-radius: 10px; /* Make it circular */
-  transform: scale(1.05); /* Smaller scale effect */
-  color: white; /* Change text color to white for better contrast */
-  /* Adjust padding for a smaller appearance */
+  background-color: rgba(255, 99, 71, 0.5);
+  border: 2px solid #ab4736;
+  border-radius: 10px;
+  transform: scale(1.05);
+  color: white;
 }
 
 .day:not(.selected) {
-  background-color: transparent; /* Neutral background for unselected */
-  border: 1px solid #ccc; /* Light border for unselected days */
-  color: rgba(54, 14, 8, 0.881); /* Default text color */
+  background-color: transparent;
+  border: 1px solid #ccc;
+  color: rgba(54, 14, 8, 0.881);
 }
 
 .day.locked {
-  position: relative; /* Ensures the lock icon is positioned relative to the day box */
-  background-color: rgba(
-    48,
-    114,
-    49,
-    0.868
-  ); /* Softer light orange background */
-  color: #380802; /* Slightly darker text color for contrast */
+  position: relative;
+  background-color: rgba(48, 114, 49, 0.868);
+  color: #380802;
   cursor: pointer;
 }
 
 .day.locked::before {
-  content: "\1F512"; /* Unicode for a lock icon */
-  font-size: 20px; /* Adjust size of the lock icon */
+  content: "\1F512";
+  font-size: 20px;
   position: absolute;
-  top: 5px; /* Position the lock icon at the top */
-  right: 0px; /* Position the lock icon at the right */
-  opacity: 0.8; /* Adds some transparency to the lock icon */
+  top: 5px;
+  right: 0px;
+  opacity: 0.8;
 }
 
 .day.unlocking::before {
-  content: "\1F513"; /* Unlock icon */
+  content: "\1F513";
   font-size: 20px;
   position: absolute;
   top: 5px;
@@ -353,7 +303,7 @@ const close = () => {
 }
 
 .day.locked span {
-  visibility: visible; /* Ensure the date number is still visible */
+  visibility: visible;
 }
 
 .day.disabled {
@@ -361,3 +311,4 @@ const close = () => {
   cursor: not-allowed;
 }
 </style>
+   -->

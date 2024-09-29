@@ -51,20 +51,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function logout() {
-    // Clear tokens and user role from localStorage
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('mode'); // Optional: clear mode on logout
+    function logout() {
+      // Clear tokens and user role from localStorage
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('mode'); // Optional: clear mode on logout
+      localStorage.removeItem('currentPage')
 
-    // Reset user role
-    userRole.value = null;
-    mode.value = PAGES.HOST.HOME; // Reset mode to default
+      delete axiosInstance.defaults.headers.common['Authorization'];
 
-    // Optional: Redirect to login
-    router.push('/login');
-  }
+      // Reset user role
+      userRole.value = null;
+      mode.value = PAGES.HOST.HOME; // Reset mode to default
+
+      // Optional: Redirect to login
+      router.push('/login');
+    }
 
   return {
     isAuthenticated,

@@ -20,7 +20,8 @@ const PAGES = {
   USER: {
     HOMESTAY: '/homestay',
     SETTINGS: '/settings',
-    BOOKING: '/booking'
+    BOOKING: '/booking',
+    HOMESTAY_DETAILS: (id) => `/homestay/${id}`  // Dynamic homestay route
   },
 
   HOST: {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchHomestays, createHomestay, updateHomestay, deleteHomestay, uploadImages, deleteImage} from '@/services/homestayService';
+import { fetchHomestays, createHomestay, updateHomestay, deleteHomestay, uploadImages,
+   deleteImage, fetchLockDates, addLockDate, removeLockDate} from '@/services/homestayService';
 
 export const useHomestayStore = defineStore('homestay', {
   state: () => ({
@@ -7,14 +8,14 @@ export const useHomestayStore = defineStore('homestay', {
     selectedHomestay: null,
     currentPage: 1,
     totalPages: 1,
-    homestayImages: {}, // Initialize to store images for each homestay
+    currentSize: 5,
+    homestayImages: {},
+    homestayLockDates: [],
   }),
   actions: {
     async loadHomestays(page = 1, size = 5) {
       try {
         const response = await fetchHomestays(page, size);
-        console.log(response.data); // Log the response for debugging
-
         // Extract homestays and pagination info
         this.homestays = response.data.data.data;
         console.log('Homestays set in store:', this.homestays);
@@ -24,6 +25,7 @@ export const useHomestayStore = defineStore('homestay', {
         console.error('Failed to fetch homestays:', error);
       }
     },
+
     async addHomestay(homestayData) {
       try {
         await createHomestay(homestayData);
@@ -62,7 +64,6 @@ export const useHomestayStore = defineStore('homestay', {
       if (homestay.images && homestay.images.length > 0) {
         // Store images directly from the homestay object
         this.homestayImages[homestay.id] = homestay.images;
-        console.log(`Loaded images for homestay ${homestay.id}:`, this.homestayImages[homestay.id]);
       } else {
         // If no images, set to an empty array
         this.homestayImages[homestay.id] = [];
@@ -93,7 +94,35 @@ export const useHomestayStore = defineStore('homestay', {
       } catch (error) {
         console.error('Failed to delete image:', error);
       }
-    }
+    },
 
+    async loadLockDates(homestayId) {
+      try {
+        const response = await fetchLockDates(homestayId);
+        this.homestayLockDates[homestayId] = response.data;
+      } catch (error) {
+        console.error(`Failed to fetch lock dates for homestay ${homestayId}:`, error);
+      }
+    },
+
+    async addLockDate(homestayId, lockDates) {
+      try {
+        await addLockDate(homestayId, lockDates);
+      } catch (error) {
+        console.error(`Failed to add lock date ${lockDates} to homestay ${homestayId}:`, error);
+      }
+
+    },
+    async removeLockDate(homestayId, lockDates) {
+      try {
+        await removeLockDate(homestayId, lockDates);
+      } catch (error) {
+        console.error(`Failed to remove lock date ${lockDates} from homestay ${homestayId}:`, error);
+      }
+    },
+    
+    getLockDatesForHomestay(homestayId) {
+      return this.homestayLockDates[homestayId] || [];
+    }
   }
 });

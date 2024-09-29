@@ -97,8 +97,8 @@ onMounted(() => {
 }
 
 .text {
-  flex: 1; /* Makes the text take up available space */
-  margin-left: -20px; /* Adjust this value as needed */
+  flex: 1; 
+  margin-left: -20px; 
 }
 
 .badge {

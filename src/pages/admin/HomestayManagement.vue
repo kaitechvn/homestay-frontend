@@ -52,6 +52,12 @@
               >
                 <i class="fas fa-images"></i>
               </button>
+              <button
+                @click="openDatepicker(homestay.id)"
+                class="btn btn-primary btn-sm"
+              >
+                <i class="fas fa-calendar-alt"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -130,21 +136,36 @@
       </div>
     </div>
 
+    <div
+      v-if="showDatepickerModal"
+      class="modal-overlay"
+      @click="closeDatepicker"
+    >
+      <div class="modal-content" @click.stop>
+        <span class="close-button" @click="closeDatepicker">&times;</span>
+
+        <!-- Include DatePicker component -->
+        <DatePicker 
+        :homestay-id="selectedHomestayId"
+        :locked-dates="lockDates"
+        @close="closeDatepicker"
+        @reopenDatePicker="reopenDatePicker"
+        />
+      </div>
+    </div>
+
     <!-- Modal for Image Management -->
     <div v-if="showImageModal" class="modal-overlay">
       <div class="modal-content images-modal">
         <h2>{{ $t("homestay-management.imagesTitle") }}</h2>
         <div class="image-list">
-          <div
-            v-for="image in images"
-            :key="image.id"
-            class="image-container"
-          >
+          <div v-for="image in images" :key="image.id" class="image-container">
             <img
-             :src="image.url" class="homestay-image" 
-             alt="Homestay Image"
-             @click="openImgDetail(imageUrl)"
-             />
+              :src="image.url"
+              class="homestay-image"
+              alt="Homestay Image"
+              @click="openImgDetail(image.url)"
+            />
             <button
               @click="deleteImage(image.id)"
               class="btn btn-danger btn-sm delete-button"
@@ -154,14 +175,13 @@
           </div>
           <!-- Modal for showing large image -->
           <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
-            <div class="modal-content" @click.stop>
-              <span class="close-button" @click="closeImgDetail">&times;</span>
-              <img
-                :src="modalImage"
-                alt="Large homestay image"
-                class="modal-image"
-              />
-            </div>
+            <span class="close-button-img" @click="closeImgDetail">&times;</span>
+            <img
+              :src="modalImage"
+              alt="Large homestay image"
+              class="modal-image"
+              @click.stop
+            />
           </div>
         </div>
         <form @submit.prevent="uploadImages">
@@ -191,10 +211,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useHomestayStore } from "@/stores/homestayStore";
+import { useHomestayStore } from "@/stores/homestayAdminStore";
 import Pagination from "@/components/Pagination.vue";
 import { useI18n } from "vue-i18n";
-import { formatPrice } from "@/utils/priceUtils"; // Adjust the path as needed
+import { formatPrice } from "@/utils/priceUtils";
+import DatePicker from "@/components/DatePicker.vue";
 
 const { t } = useI18n();
 const homestayStore = useHomestayStore();
@@ -222,7 +243,12 @@ const {
   getImagesForHomestay,
   uploadHomestayImages,
   deleteHomestayImage,
+  loadLockDates,
+  getLockDatesForHomestay,
 } = homestayStore;
+
+const selectedHomestayId = ref(null); // Track the selected homestay ID
+
 
 const startCreatingHomestay = () => {
   form.value = { name: "", district: "", address: "" };
@@ -245,7 +271,6 @@ const submitForm = async () => {
       successMessage.value = t("messages.add-success");
     }
     showModal.value = false;
-    await loadHomestays();
   } catch (error) {
     console.error(error);
   }
@@ -255,7 +280,6 @@ const deleteHomestay = async (homestayId) => {
   try {
     await removeHomestay(homestayId);
     successMessage.value = t("messages.delete-success");
-    await loadHomestays();
   } catch (error) {
     console.error(error);
   }
@@ -276,10 +300,8 @@ const openImageModal = async (homestay) => {
 
   images.value = imagesFromBackend.map((image) => ({
     id: image.id,
-    url: image.url // Directly using the URL from the backend
+    url: image.url,
   }));
-
-  console.log(images.value);
 };
 
 const handleFileSelect = (event) => {
@@ -309,8 +331,7 @@ const deleteImage = async (imageId) => {
     await deleteHomestayImage(selectedHomestay.value.id, imageId);
     successMessage.value = t("messages.image-delete-success");
 
-    await reloadHomestayImages(selectedHomestay.value.id); 
-
+    await reloadHomestayImages(selectedHomestay.value.id);
   } catch (error) {
     console.error(error);
     errorMessage.value = t("messages.image-delete-fail");
@@ -323,26 +344,20 @@ const closeImageModal = () => {
 
 const reloadHomestayImages = async (homestayId) => {
   const currentPage = homestayStore.currentPage;
-  await homestayStore.loadHomestays(currentPage, 5);
+  await loadHomestays(currentPage, 5);
 
   const updatedHomestay = homestayStore.homestays.find(
     (h) => h.id === homestayId
   );
 
-  console.log("Updated Homestay:", updatedHomestay); // Log to see the updated homestay
   if (updatedHomestay) {
     selectedHomestay.value = updatedHomestay;
 
-    // Log the images to verify
-    console.log("New Homestay Images:", updatedHomestay.images);
-
     // Update images array
     images.value = updatedHomestay.images.map((image) => ({
-      id: image.id, 
-      url: image.url 
+      id: image.id,
+      url: image.url,
     }));
-
-    console.log("Updated Images:", images.value);
   }
 };
 
@@ -359,6 +374,29 @@ const openImgDetail = (imageUrl) => {
 const closeImgDetail = () => {
   isModalOpen.value = false; // Hide the modal
   modalImage.value = ""; // Clear the modal image
+};
+
+const showDatepickerModal = ref(false);
+const lockDates = ref([]); 
+
+const openDatepicker = async (homestayId) => {
+  selectedHomestayId.value = homestayId; // Set the selected homestay ID
+  showDatepickerModal.value = true;
+
+  await loadLockDates(homestayId);
+
+  const dates = getLockDatesForHomestay(homestayId);
+  lockDates.value = dates;
+};
+
+const reopenDatePicker = () => {
+      // Logic to reopen the date picker
+      openDatepicker(selectedHomestayId.value); // Call the openDatepicker function
+    };
+
+// Method to close the Datepicker modal
+const closeDatepicker = () => {
+  showDatepickerModal.value = false;
 };
 
 onMounted(async () => {
@@ -480,13 +518,6 @@ onMounted(async () => {
   flex-direction: column; /* Stack children vertically */
 }
 
-.file-upload-container {
-  display: flex; /* Use flexbox for alignment */
-  flex-direction: column; /* Stack vertically */
-  align-items: flex-start; /* Align items to the start */
-  margin-top: auto; /* Push this section to the bottom */
-}
-
 .success-message {
   display: flex;
   align-items: center;
@@ -542,10 +573,13 @@ onMounted(async () => {
 }
 
 .modal-image {
-  width: 550px;
-  height: 320px;  /* Increase height limit to allow more vertical space */
+  width: 80vw; /* Full viewport width */
+  height: 80vh; /* Full viewport height */
+  object-fit: cover; /* Cover the entire area, may crop the image */
   display: block;
-  margin: 0 auto;    /* Center the image horizontally */
+  border-radius: 0; /* No rounded corners for full coverage */
+  box-shadow: none; /* No shadow for a clean full-screen look */
+  margin: 0; /* No margin for full screen */
 }
 
 .close-button {
@@ -561,6 +595,24 @@ onMounted(async () => {
 
 .close-button:hover {
   color: #ff0000; /* Red color on hover */
+}
+
+.close-button-img {
+  position: absolute; /* Absolute positioning */
+  top: 20px; /* Distance from the top */
+  right: 20px; /* Distance from the right */
+  font-size: 24px; /* Increase font size for visibility */
+  color: white; /* Button text color */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  border: none; /* No border */
+  border-radius: 50%; /* Rounded button */
+  padding: 5px 10px; /* Padding for the button */
+  cursor: pointer; /* Change cursor on hover */
+  z-index: 1001; /* Ensure it appears above the image */
+}
+
+.close-button-img:hover {
+  background: rgba(0, 0, 0, 0.7); 
 }
 
 @keyframes fadeIn {

@@ -19,6 +19,9 @@
           <li class="nav-item">
             <router-link class="nav-link mx-2" to="/booking">Booking</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link mx-2" to="/about-us">About Us</router-link>
+          </li>
           <li class="nav-item d-none d-lg-block">
             <router-link class="nav-link mx-2" to="/">
               <img src="@/assets/logo-navbar.png" height="70" />

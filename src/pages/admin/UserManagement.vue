@@ -310,7 +310,6 @@ const submitForm = async () => {
       successMessage.value = t("messages.add-success"); // Set success message
     }
     showModal.value = false;
-    await loadUsers();
     hideSuccessMessage(); // Hide success message after a delay
   } catch (error) {
     console.error(error);
@@ -321,7 +320,6 @@ const deleteUser = async (userId) => {
   try {
     await removeUser(userId);
     successMessage.value = t("messages.delete-success");
-    await loadUsers();
     hideSuccessMessage();
   } catch (error) {
     console.error(error);
@@ -338,10 +336,17 @@ const closeModal = () => {
   showModal.value = false;
 };
 
-onMounted(() => {
-  loadUsers();
+onMounted(async () => {
+  // Check if there is a stored currentPage in localStorage
+  const savedPage = localStorage.getItem('currentPage');
+  const pageToLoad = savedPage ? parseInt(savedPage, 10) : 1; // Default to page 1 if nothing is saved
+
+  // Load homestays based on saved or default page
+  await loadUsers(pageToLoad);
 });
+
 </script>
+
 
 
 <style scoped>

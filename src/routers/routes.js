@@ -10,13 +10,18 @@ import Dashboard from "@/pages/admin/Dashboard.vue";
 import UserManagement from "@/pages/admin/UserManagement.vue";
 import Message from "@/pages/admin/Message.vue";
 import HomestayManagement from "@/pages/admin/HomestayManagement.vue";
+import HomestayDetails from "@/pages/HomestayDetails.vue";
+import Homestay from "@/pages/user/Homestay.vue";
 
 const routes = [
+
   // General routes
   { path: PAGES.LOGIN, component: Login },
   { path: PAGES.REGISTER, component: Register },
   { path: PAGES.HOME, component: Home },
   { path: PAGES.FORBIDDEN, component: Forbidden },  
+
+  // ADMIN routes
   {
     path: PAGES.ADMIN.HOME,
     component: Admin, 
@@ -28,16 +33,22 @@ const routes = [
       { path: PAGES.ADMIN.MESSAGE, component: Message} 
     ],
   },
+
+  // USER routes
+  {
+    path: PAGES.USER.HOMESTAY, component: Homestay
+  },
+
+  {
+    path: PAGES.USER.HOMESTAY_DETAILS(':id'),
+    component: HomestayDetails,
+    props: true
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
-
-function getUserRole() {
-  // You would fetch the user's role from your store or decode the JWT token
-  return localStorage.getItem("userRole"); // "ADMIN" or "USER"
-}
 
 export default router;
