@@ -213,6 +213,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useRoute } from "vue-router"; 
 import { useHomestayUserStore } from "@/stores/homestayUserStore";
 import Pagination from "@/components/Pagination.vue";
 import BookingModal from "@/components/booking/BookingModal.vue";
@@ -227,6 +228,7 @@ const getExchangeRate = async () => {
   exchangeRate.value = await fetchExchangeRate();
 };
 
+const route = useRoute(); // Access the route object
 const currencyStore = useCurrencyStore(); // Access the Pinia store
 const exchangeRate = ref(0); // Store the exchange rate
 const homestayUserStore = useHomestayUserStore();
@@ -247,7 +249,7 @@ const filters = ref({
   guests: "",
   checkIn: "",
   checkOut: "",
-  districtId: "",
+  districtId: route.params.districtId || "", // Get districtId from route params
 });
 
 const homestayList = ref(null); // Reference for the homestay list
@@ -255,7 +257,7 @@ const homestayList = ref(null); // Reference for the homestay list
 // Load homestays on component mount
 onMounted(async () => {
   await filterHomestays(filters.value);
-  getExchangeRate(); // Fetch exchange rate on component mount
+  getExchangeRate(); 
 });
 
 // Search homestays with applied filters

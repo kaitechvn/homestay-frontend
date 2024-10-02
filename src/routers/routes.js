@@ -39,7 +39,7 @@ const routes = [
 
   // USER routes
   {
-    path: PAGES.USER.HOMESTAY, component: Homestay
+    path: PAGES.USER.HOMESTAY, name: 'Homestay', component: Homestay
   },
 
   {

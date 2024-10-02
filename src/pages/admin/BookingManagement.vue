@@ -46,24 +46,31 @@
             <td class="text-center">{{ booking.totalAmount }}</td>
             <td class="text-center">
               <span
-                :class="{
-                  'badge badge-active': booking.status === 'CONFIRMED',
-                  'badge badge-cancelled': booking.status === 'CANCELLED',
-                  'badge badge-pending': booking.status === 'PENDING',
-                }"
+                v-if="booking.status === 'PENDING'"
                 @click="toggleDropdown"
+                class="badge badge-pending"
+                style="cursor: pointer"
               >
                 {{ booking.status }}
               </span>
 
-              <!-- Dropdown only for Pending status -->
+              <!-- For other statuses (CONFIRMED, CANCELLED) without click functionality -->
+              <span
+                v-else
+                :class="{
+                  'badge badge-active': booking.status === 'CONFIRMED',
+                  'badge badge-cancelled': booking.status === 'CANCELLED',
+                }"
+              >
+                {{ booking.status }}
+              </span>
               <div
-                v-if="showDropdown && booking.status === 'PENDING'"
-                class="dropdown-menu"
+                v-if="isDropdownVisible && booking.status === 'PENDING'"
+                class="dropdown"
               >
                 <ul>
-                  <li @click="confirmBooking(booking.id)">Confirm</li>
-                  <li @click="cancelBooking(booking.id)">Cancel</li>
+                  <li @click="confirm(booking.bookingId)">CONFIRMED</li>
+                  <li @click="cancel(booking.bookingId)">CANCELLED</li>
                 </ul>
               </div>
             </td>
@@ -179,22 +186,6 @@
                 required
               />
             </div>
-            <div class="form-group">
-              <label for="status" class="form-label">{{
-                $t("booking-management.status")
-              }}</label>
-              <select v-model="form.status" class="form-control" id="status">
-                <option value="PENDING">
-                  {{ $t("booking-management.status.pending") }}
-                </option>
-                <option value="CONFIRMED">
-                  {{ $t("booking-management.status.confirmed") }}
-                </option>
-                <option value="CANCELLED">
-                  {{ $t("booking-management.status.cancelled") }}
-                </option>
-              </select>
-            </div>
           </div>
 
           <button type="submit" class="btn btn-primary mt-3">
@@ -229,7 +220,7 @@ const bookings = computed(() => bookingStore.bookings);
 const selectedBooking = computed(() => bookingStore.selectedBooking);
 const currentPage = computed(() => bookingStore.currentPage);
 const totalPages = computed(() => bookingStore.totalPages);
-const showDropdown = ref(false);
+const isDropdownVisible = ref(false);
 
 const {
   loadBookings,
@@ -313,7 +304,7 @@ const closeModal = () => {
 };
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
+  isDropdownVisible.value = !isDropdownVisible.value;
 };
 
 const confirmBooking = (bookingId) => {
@@ -330,7 +321,6 @@ const cancelBooking = (bookingId) => {
 };
 
 onMounted(async () => {
-  // Check if there is a stored currentPage in localStorage
   const savedPage = localStorage.getItem("currentPage");
   const pageToLoad = savedPage ? parseInt(savedPage, 10) : 1;
   await loadBookings(pageToLoad);
@@ -346,8 +336,8 @@ onMounted(async () => {
 
 .header-container {
   display: flex;
-  align-items: center; /* Center items vertically */
-  justify-content: space-between; /* Space between title and right content */
+  align-items: center; 
+  justify-content: space-between; 
 }
 
 .header-title {
@@ -471,6 +461,29 @@ onMounted(async () => {
   background-image: url("https://icons.getbootstrap.com/assets/icons/check-circle-fill.svg");
   background-size: 1em 1em;
   margin-right: 5px;
+}
+
+.dropdown {
+  position: absolute; /* Adjust positioning as necessary */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+.dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: #f0f0f0; /* Change color on hover */
 }
 
 /* Keyframes for success message animation */
