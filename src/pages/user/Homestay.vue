@@ -111,7 +111,18 @@
             <p class="homestay-price">
               <!-- Font Awesome money icon -->
               <img src="@/assets/money.png" alt="Icon" class="custom-icon" />
-              <strong>{{ formatPrice(homestay.price) }} VND/night</strong>
+              <strong>
+                {{ priceFormatter(homestay.price) }}
+                {{
+                  currencyStore.currentCurrency === "VND"
+                    ? "VND/night"
+                    : currencyStore.currentCurrency === "USD"
+                    ? "USD/night"
+                    : currencyStore.currentCurrency === "JPY"
+                    ? "JPY/night"
+                    : ""
+                }}
+              </strong>
             </p>
 
             <div class="homestay-rating">
@@ -137,11 +148,9 @@
               <span class="rating-value"
                 >({{ homestay.rating.toFixed(1) }})</span
               >
-              <!-- Display the rating -->
             </div>
             <div class="review-container">
               <i class="fas fa-comment-alt review-icon"></i>
-              <!-- Review icon (Font Awesome) -->
 
               <span class="review-count"
                 >{{ homestay.reviewCount }} reviews</span
@@ -153,19 +162,19 @@
             <p class="homestay-description">
               {{ homestay.description }}
             </p>
+
             <span class="detail">
               <i class="fas fa-bed"></i>
-              <!-- Bedroom icon -->
               <span class="value">{{ homestay.bedrooms }} Bedrooms</span>
             </span>
+
             <span class="detail">
               <i class="fas fa-bath"></i>
-              <!-- Bathroom icon -->
               <span class="value">{{ homestay.bathrooms }} Bathrooms</span>
             </span>
+
             <span class="detail">
               <i class="fas fa-user-friends"></i>
-              <!-- Guests icon -->
               <span class="value">{{ homestay.guests }} Max Guests</span>
             </span>
 
@@ -173,8 +182,8 @@
               <button class="view-details">
                 <i class="fas fa-info-circle"></i> View Details
               </button>
-              <!-- @click="openBookingModal(homestay) -->
-              <button class="book-now"  @click="openBookingModal(homestay)">
+
+              <button class="book-now" @click="openBookingModal(homestay)">
                 <i class="fas fa-home"></i> Book Now
               </button>
             </div>
@@ -185,20 +194,19 @@
               </button>
             </div>
           </div>
-          
-          <BookingModal
-          :isVisible="isModalVisible"
-          :homestay="selectedHomestay"
-          @onClose="closeBookingModal"
-        />
 
+          <BookingModal
+            :isVisible="isModalVisible"
+            :homestay="selectedHomestay"
+            @onClose="closeBookingModal"
+          />
         </div>
       </li>
     </ul>
   </div>
   <Pagination
     :currentPage="currentPage"
-    :totalPages="totalPages"  
+    :totalPages="totalPages"
     @page-changed="loadHomestays"
   />
 </template>
@@ -206,13 +214,21 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useHomestayUserStore } from "@/stores/homestayUserStore";
-import Pagination from "@/components/Pagination.vue"; // Adjust the import path as necessary
-import { formatPrice } from "@/utils/priceUtils";
+import Pagination from "@/components/Pagination.vue";
 import BookingModal from "@/components/booking/BookingModal.vue";
 import { DISTRICTS } from "@/constants/districts";
 import { PRICE_RANGES } from "@/constants/prices";
 import { guestOptions } from "@/constants/guests";
+import { useCurrencyStore } from "@/stores/currencyStore";
 
+import { fetchExchangeRate, formattedPrice } from "@/utils/currencyUtils";
+
+const getExchangeRate = async () => {
+  exchangeRate.value = await fetchExchangeRate();
+};
+
+const currencyStore = useCurrencyStore(); // Access the Pinia store
+const exchangeRate = ref(0); // Store the exchange rate
 const homestayUserStore = useHomestayUserStore();
 const currentPage = computed(() => homestayUserStore.currentPage);
 const totalPages = computed(() => homestayUserStore.totalPages);
@@ -239,6 +255,7 @@ const homestayList = ref(null); // Reference for the homestay list
 // Load homestays on component mount
 onMounted(async () => {
   await filterHomestays(filters.value);
+  getExchangeRate(); // Fetch exchange rate on component mount
 });
 
 // Search homestays with applied filters
@@ -265,6 +282,14 @@ const resetFilters = () => {
   };
   homestayUserStore.filters = { ...filters.value }; // Clear filters in store
   filterHomestays(homestayUserStore.filters); // Reload homestays
+};
+
+const priceFormatter = (price) => {
+  return formattedPrice(
+    price,
+    currencyStore.currentCurrency,
+    exchangeRate.value
+  );
 };
 
 // const viewHomestay = (homestay) => {
@@ -374,11 +399,9 @@ const updatePriceRange = () => {
   width: 157px; /* Set a smaller width for the Price Range dropdown */
 }
 
-
 .inline-field:nth-child(2) .filter-select {
   width: 157px; /* Set a smaller width for the Price Range dropdown */
 }
-
 
 .filter-select,
 .inline-input {

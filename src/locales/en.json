@@ -114,6 +114,28 @@
     "reviewCount": "Reviews"
   },
 
+  "booking-management": {
+    "title": "Booking Management",
+    "addBooking": "Add Booking",
+    "userId": "User ID",
+    "homestayId": "Homestay ID",
+    "checkinDate": "Check-in",
+    "checkoutDate": "Check-out",
+    "guests": "Guests",
+    "status": "Status",
+    "totalAmount": "Amount",
+    "actions": "Actions",
+    "editBooking": "Edit Booking",
+    "update": "Update",
+    "add": "Add",
+    "cancel": "Cancel",
+    "detail-status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    }
+  },
+      
   "messages": {
     "add-success": "Created successfully",
     "update-sucess": "Updated successfully",

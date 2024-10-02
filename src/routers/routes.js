@@ -12,6 +12,8 @@ import Message from "@/pages/admin/Message.vue";
 import HomestayManagement from "@/pages/admin/HomestayManagement.vue";
 import HomestayDetails from "@/pages/HomestayDetails.vue";
 import Homestay from "@/pages/user/Homestay.vue";
+import NotFound from "@/pages/exception/NotFound.vue";
+import BookingManagement from "@/pages/admin/BookingManagement.vue";
 
 const routes = [
 
@@ -30,7 +32,8 @@ const routes = [
       { path: PAGES.ADMIN.DASHBOARD, component: Dashboard },
       { path: PAGES.ADMIN.USER_MANAGEMENT, component: UserManagement },
       { path: PAGES.ADMIN.HOMESTAY_MANAGEMENT, component: HomestayManagement},
-      { path: PAGES.ADMIN.MESSAGE, component: Message} 
+      { path: PAGES.ADMIN.MESSAGE, component: Message},
+      { path: PAGES.ADMIN.BOOKING_MANAGEMENT, component: BookingManagement}
     ],
   },
 
@@ -44,7 +47,13 @@ const routes = [
     component: HomestayDetails,
     props: true
   },
+
+  {
+    path: "/:catchAll(.*)", // Catch-all route for undefined paths
+    component: NotFound
+  },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -31,7 +31,7 @@
             <td class="text-center">{{ homestay.name }}</td>
             <td class="text-center">{{ homestay.district }}</td>
             <td class="text-center">{{ homestay.address }}</td>
-            <td class="text-center">{{ formatPrice(homestay.price) }}</td>
+            <td class="text-center">{{ formatVNDPrice(homestay.price) }}</td>
             <td>{{ formatBedBath(homestay.bedrooms, homestay.bathrooms) }}</td>
             <td class="text-center">
               <button
@@ -214,7 +214,7 @@ import { ref, computed, onMounted } from "vue";
 import { useHomestayStore } from "@/stores/homestayAdminStore";
 import Pagination from "@/components/Pagination.vue";
 import { useI18n } from "vue-i18n";
-import { formatPrice } from "@/utils/priceUtils";
+import { formatVNDPrice } from "@/utils/currencyUtils";
 import DatePicker from "@/components/DatePicker.vue";
 
 const { t } = useI18n();

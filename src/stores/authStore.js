@@ -8,13 +8,12 @@ import PAGES from '@/constants/pages';
 export const useAuthStore = defineStore('auth', () => {
   const userRole = ref(localStorage.getItem('userRole') || null);  
   const router = useRouter();
-  const mode = ref(localStorage.getItem('mode') || PAGES.HOST.HOME); // Retrieve mode from localStorage or set default
-
-  const isAuthenticated = computed(() => !!userRole.value); // Derived authentication status
+  const mode = ref(localStorage.getItem('mode') || PAGES.HOST.HOME); 
+  const isAuthenticated = computed(() => !!userRole.value);
 
   function toggleMode() {
     mode.value = (mode.value === PAGES.HOME) ? PAGES.HOST.HOME : PAGES.HOME;
-    localStorage.setItem('mode', mode.value); // Store the mode in localStorage
+    localStorage.setItem('mode', mode.value);
   }
 
   // Actions
@@ -23,11 +22,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await axiosInstance.post('/auth/login', { username, password });
       const { accessToken, refreshToken } = response.data.data;
 
-      // Store tokens in localStorage
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh_token', refreshToken);
 
-      // Set the Authorization header for subsequent requests
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
       // Decode the token to get the user's role
@@ -47,12 +44,11 @@ export const useAuthStore = defineStore('auth', () => {
       
     } catch (error) {
       console.error('Login failed:', error);
-      // Handle error (e.g., display an error message)
     }
   }
 
     function logout() {
-      // Clear tokens and user role from localStorage
+
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('userRole');
@@ -61,11 +57,9 @@ export const useAuthStore = defineStore('auth', () => {
 
       delete axiosInstance.defaults.headers.common['Authorization'];
 
-      // Reset user role
       userRole.value = null;
       mode.value = PAGES.HOST.HOME; // Reset mode to default
 
-      // Optional: Redirect to login
       router.push('/login');
     }
 

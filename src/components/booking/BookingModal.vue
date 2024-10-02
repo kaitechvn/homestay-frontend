@@ -3,8 +3,10 @@
     <div class="modal-content">
       <div class="header-container">
         <!-- Show the first image and make it clickable -->
-        <h2 class="modal-title">Booking Details for  {{ homestay.name }}</h2>
-        
+        <h2 class="modal-title">
+          Booking Details of Homestay {{ homestay.name }}
+        </h2>
+
         <img
           v-if="homestay.images && homestay.images.length > 0"
           :src="homestay.images[0].url"
@@ -64,6 +66,9 @@
               </select>
             </div>
           </form>
+          <div class="total-amount">
+            Total Amount: {{ formatVNDPrice(totalAmount) }} VND
+          </div>
         </div>
 
         <div class="form-section">
@@ -91,8 +96,12 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn confirm" @click="submitBooking">
-          Confirm Booking
+        <button
+          class="btn confirm"
+          @click="handleConfirmBooking"
+          :disabled="loading"
+        >
+          {{ loading ? "Processing..." : "Confirm Booking" }} Confirm Booking
         </button>
         <button class="btn cancel" @click="closeModal">Cancel</button>
       </div>
@@ -101,10 +110,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits, computed } from "vue";
 import vnPayImage from "@/assets/vnpay.png";
 import paypalImage from "@/assets/paypal.png";
 import codImage from "@/assets/cod.png";
+import { formatVNDPrice } from "@/utils/currencyUtils";
+import { createBooking } from '@/services/bookingService'; // Adjust path as needed
+import { createVnPayPayment } from '@/services/paymentService'; // Adjust path as needed
 
 const props = defineProps({
   isVisible: {
@@ -117,12 +129,22 @@ const props = defineProps({
   },
 });
 
+const loading = ref(false);
 const showGallery = ref(false);
-
 // Function to close the gallery modal
 const closeGallery = () => {
   showGallery.value = false;
 };
+
+const totalAmount = computed(() => {
+  if (checkin.value && checkout.value) {
+    const checkInDate = new Date(checkin.value);
+    const checkOutDate = new Date(checkout.value);
+    const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24); // Include both check-in and check-out dates
+    return days * props.homestay.price; // Accessing price directly from props
+  }
+  return ""; // Return 0 if dates are not valid
+});
 
 // Function to return the corresponding image path based on selected payment method
 const getPaymentImage = (method) => {
@@ -140,7 +162,7 @@ const getPaymentImage = (method) => {
 
 const emit = defineEmits(["onClose"]);
 
-const guests = ref(1);
+const guests = ref("");
 const checkin = ref("");
 const checkout = ref("");
 const name = ref("");
@@ -152,21 +174,41 @@ function closeModal() {
   emit("onClose");
 }
 
-function submitBooking() {
-  console.log({
-    guests: guests.value,
-    checkin: checkin.value,
-    checkout: checkout.value,
-    name: name.value,
-    email: email.value,
-    phone: phone.value,
-    paymentMethod: paymentMethod.value,
-  });
+// Define methods directly
+const handleConfirmBooking = async () => {
+  loading.value = true; // Set loading to true when the process starts
+  try {
+    // Step 1: Create the booking request body
+    const bookingData = {
+      guests: guests.value,
+      checkinDate: checkin.value,
+      checkoutDate: checkout.value,
+      contactName: name.value,
+      contactEmail: email.value,
+      contactPhone: phone.value,
+      homestayId: props.homestay.id
+    };
+
+    // Call the booking service with bookingData
+    const bookingResponse = await createBooking(bookingData);
+    const bookingId = bookingResponse.data.bookingId;
+    const amount = bookingResponse.data.totalAmount;
+    const bankCode = null;
+
+    // Step 2: Initiate payment using the bookingId
+    const paymentResponse = await createVnPayPayment(amount, bankCode, bookingId);
+
+    // Step 3: Redirect to payment URL
+    window.location.href = paymentResponse.data.paymentUrl;
+  } catch (error) {
+    console.error('Error during booking or payment:', error);
+    // Show error message to user
+  } finally {
+    loading.value = false; // Set loading to false when the process finishes
+  }
+};
 
   // Here, you can add your logic to send the booking data to your backend
-
-  closeModal();
-}
 </script>
 
 <style scoped>
@@ -195,6 +237,7 @@ function submitBooking() {
   justify-content: center;
   align-items: center;
   transition: opacity 0.3s ease; /* Smooth transition */
+  z-index: 5; /* High z-index for the overlay */
 }
 
 .modal-content {
@@ -215,7 +258,7 @@ function submitBooking() {
 .modal-body {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .form-section {
@@ -299,7 +342,7 @@ select:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Make sure the modal is on top */
+  z-index: 10; /* Make sure the modal is on top */
 }
 
 .image-gallery-modal {
@@ -343,5 +386,15 @@ select:focus {
   font-size: 15px;
   font-weight: bold;
   cursor: pointer; /* Add pointer cursor */
+}
+
+.total-amount {
+  font-size: 1.1em; /* Slightly larger font size for emphasis */
+  color: #ffffff; /* White text color for contrast */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Deeper shadow for depth */
+  border-radius: 3px; /* Rounded corners */
+  background-color: #685c2d; /* Bright blue background color */
+  text-align: center; /* Center the text for better presentation */
+  font-family: "Arial", sans-serif; /* Set a clean, modern font */
 }
 </style>

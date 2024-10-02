@@ -20,7 +20,7 @@
             <router-link class="nav-link" to="/admin/homestay-management">{{ $t('admin-navbar.homestays') }}</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/admin/bookings">{{ $t('admin-navbar.bookings') }}</router-link>
+            <router-link class="nav-link" to="/admin/booking-management">{{ $t('admin-navbar.bookings') }}</router-link>
           </li>
 
           <li class="nav-item">
