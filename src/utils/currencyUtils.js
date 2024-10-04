@@ -15,7 +15,7 @@ export async function fetchExchangeRate() {
   }
 
     export function convertVNDToUSD(vndAmount, exchangeRate) {
-        if (!exchangeRate) return null; // If exchange rate is not available
+        if (!exchangeRate) return null; 
         console.log(vndAmount * exchangeRate);
         return (vndAmount * exchangeRate).toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -24,7 +24,7 @@ export async function fetchExchangeRate() {
     }
 
     export function convertVNDToJPY(vndAmount, exchangeRate) {
-        if (!exchangeRate) return null; // If exchange rate is not available
+        if (!exchangeRate) return null;
         console.log(vndAmount * exchangeRate);
         return (vndAmount * exchangeRate).toLocaleString(undefined, {
         minimumFractionDigits: 0,

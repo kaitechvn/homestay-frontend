@@ -179,7 +179,7 @@
             </span>
 
             <div class="button-container">
-              <button class="view-details">
+              <button class="view-details" @click="viewDetails(homestay)">
                 <i class="fas fa-info-circle"></i> View Details
               </button>
 
@@ -213,7 +213,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router"; 
+import { useRoute, useRouter } from "vue-router";
 import { useHomestayUserStore } from "@/stores/homestayUserStore";
 import Pagination from "@/components/Pagination.vue";
 import BookingModal from "@/components/booking/BookingModal.vue";
@@ -221,16 +221,16 @@ import { DISTRICTS } from "@/constants/districts";
 import { PRICE_RANGES } from "@/constants/prices";
 import { guestOptions } from "@/constants/guests";
 import { useCurrencyStore } from "@/stores/currencyStore";
-
 import { fetchExchangeRate, formattedPrice } from "@/utils/currencyUtils";
 
 const getExchangeRate = async () => {
   exchangeRate.value = await fetchExchangeRate();
 };
 
-const route = useRoute(); // Access the route object
-const currencyStore = useCurrencyStore(); // Access the Pinia store
-const exchangeRate = ref(0); // Store the exchange rate
+const route = useRoute();
+const router = useRouter();
+const currencyStore = useCurrencyStore(); 
+const exchangeRate = ref(0); 
 const homestayUserStore = useHomestayUserStore();
 const currentPage = computed(() => homestayUserStore.currentPage);
 const totalPages = computed(() => homestayUserStore.totalPages);
@@ -242,36 +242,32 @@ const { filterHomestays, setSelectedHomestay, clearSelectedHomestay } =
 const districtId = ref(DISTRICTS);
 
 const filters = ref({
-  page: 1, // Set default page
-  size: 5, // Set default size (number of items per page)
+  page: 1,
+  size: 5,
   minPrice: "",
   maxPrice: "",
   guests: "",
   checkIn: "",
   checkOut: "",
-  districtId: route.params.districtId || "", // Get districtId from route params
+  districtId: route.query.districtId || "",
 });
 
-const homestayList = ref(null); // Reference for the homestay list
+const homestayList = ref(null);
 
-// Load homestays on component mount
 onMounted(async () => {
   await filterHomestays(filters.value);
-  getExchangeRate(); 
+  getExchangeRate();
 });
 
-// Search homestays with applied filters
 const searchHomestays = () => {
-  // Update filters in the store and fetch filtered homestays
-  homestayUserStore.filters = { ...filters.value }; // Set filters in store
-  filterHomestays(homestayUserStore.filters); // Fetch filtered homestays
+  homestayUserStore.filters = { ...filters.value };
+  filterHomestays(homestayUserStore.filters);
 
   if (homestayList.value) {
     homestayList.value.scrollIntoView({ behavior: "smooth" });
   }
 };
 
-// Reset filters to default values
 const resetFilters = () => {
   filters.value = {
     minPrice: "",
@@ -282,8 +278,8 @@ const resetFilters = () => {
     districtId: "",
     rating: "",
   };
-  homestayUserStore.filters = { ...filters.value }; // Clear filters in store
-  filterHomestays(homestayUserStore.filters); // Reload homestays
+  homestayUserStore.filters = { ...filters.value };
+  filterHomestays(homestayUserStore.filters);
 };
 
 const priceFormatter = (price) => {
@@ -294,12 +290,6 @@ const priceFormatter = (price) => {
   );
 };
 
-// const viewHomestay = (homestay) => {
-//   setSelectedHomestay(homestay); // Set the selected homestay
-//   // Navigate to the details page
-//   router.push({ name: "HomestayDetails", params: { id: homestay.id } });
-// };
-
 const isModalVisible = ref(false);
 
 const openBookingModal = (homestay) => {
@@ -307,29 +297,32 @@ const openBookingModal = (homestay) => {
   isModalVisible.value = true;
 };
 
+
 const closeBookingModal = () => {
   isModalVisible.value = false;
   clearSelectedHomestay();
 };
 
+const viewDetails = (homestay) => {
+  router.push({ name: 'HomestayDetail', params: { id: homestay.id } }).then(() => {
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  });
+};
 const loadHomestays = (newPage) => {
-  filters.value.page = newPage; // Update current page
-  filterHomestays(filters.value); // Fetch homestays for the new page
+  filters.value.page = newPage; 
+  filterHomestays(filters.value); 
 };
 
 function openMap(homestay) {
-  const location = encodeURIComponent(`${homestay.name} ${homestay.address}`); // Use name or address
+  const location = encodeURIComponent(`${homestay.name} ${homestay.address}`); 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${location}`;
-  window.open(googleMapsUrl, "_blank"); // Open in a new tab
+  window.open(googleMapsUrl, "_blank"); 
 }
 
-// Separate ref for the selected price range
 const selectedPriceRange = ref("");
 
-// List of price ranges
 const priceRanges = PRICE_RANGES;
 
-// Method to update the price range in filters
 const updatePriceRange = () => {
   const selectedRange = priceRanges.find(
     (range) => range.id === selectedPriceRange.value
@@ -343,6 +336,8 @@ const updatePriceRange = () => {
     filters.value.maxPrice = null;
   }
 };
+
+
 </script>
 
 <style scoped>

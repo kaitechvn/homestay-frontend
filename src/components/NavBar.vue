@@ -249,6 +249,8 @@ function logout() {
   authStore.logout();
 }
 
+
+
 // Function to initialize local storage values
 function initializeLocalStorage() {
   if (!localStorage.getItem("selectedLanguage")) {

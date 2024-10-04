@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
         console.log('Redirecting to:', PAGES.ADMIN.HOME); // Debug to see the path
         await router.push(PAGES.ADMIN.HOME);
       } else {
-        await router.push(PAGES.USER.HOMESTAY);
+        await router.push(PAGES.HOME);
       }
       
     } catch (error) {

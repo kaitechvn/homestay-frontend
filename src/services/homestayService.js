@@ -1,19 +1,23 @@
-import axiosInstance from "@/plugins/axios";
+import axiosInstance from '@/plugins/axios';
 
 const API_HOMESTAY = '/homestays'; // Adjust according to your backend API
 
 export const fetchHomestays = (page = 1, size = 5) => {
   return axiosInstance.get(API_HOMESTAY, {
-    params: { page, size }
+    params: { page, size },
   });
 };
 
+export const fetchHomestayDetailById = async (homestayId) => {
+  // Make an API call to fetch the homestay detail by ID
+  return axiosInstance.get(`${API_HOMESTAY}/${homestayId}`);
+  
+};
 export const filterHomestays = (filters) => {
   return axiosInstance.get(`${API_HOMESTAY}/filter`, {
-    params:  filters 
+    params: filters,
   });
 };
-
 
 export const createHomestay = (homestayData) => {
   return axiosInstance.post(API_HOMESTAY, homestayData);
@@ -30,18 +34,20 @@ export const deleteHomestay = (homestayId) => {
 // Images
 export const uploadImages = (homestayId, files) => {
   const formData = new FormData();
-  files.forEach(file => {
+  files.forEach((file) => {
     formData.append('image', file);
   });
   return axiosInstance.post(`${API_HOMESTAY}/${homestayId}/images`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 
 export const deleteImage = (homestayId, imageUrl) => {
-  return axiosInstance.delete(`${API_HOMESTAY}/${homestayId}/images/${imageUrl}`);
+  return axiosInstance.delete(
+    `${API_HOMESTAY}/${homestayId}/images/${imageUrl}`
+  );
 };
 
 export const fetchLockDates = (homestayId) => {
@@ -50,13 +56,20 @@ export const fetchLockDates = (homestayId) => {
 
 // Add a lock date for a homestay
 export const addLockDate = (homestayId, lockDates) => {
-  return axiosInstance.post(`${API_HOMESTAY}/${homestayId}/lockdates`, lockDates);
+  return axiosInstance.post(
+    `${API_HOMESTAY}/${homestayId}/lockdates`,
+    lockDates
+  );
 };
 
 // Remove a specific lock date for a homestay
 export const removeLockDate = (homestayId, unlockDates) => {
-  return axiosInstance.post(`${API_HOMESTAY}/${homestayId}/unlockdates`, unlockDates);
-}
+  return axiosInstance.post(
+    `${API_HOMESTAY}/${homestayId}/unlockdates`,
+    unlockDates
+  );
+};
 
-
-  
+export const fetchTopRatedHomestays = () => {
+  return axiosInstance.get(`${API_HOMESTAY}/top-rated`);
+};

@@ -2,7 +2,7 @@
   <div>
     <AdminNavBar v-if="isAdmin" />
     <NavBar v-else/>
-    <router-view />
+    <router-view/>
     <Footer />
   </div>
 </template>

@@ -101,7 +101,7 @@
           @click="handleConfirmBooking"
           :disabled="loading"
         >
-          {{ loading ? "Processing..." : "Confirm Booking" }} Confirm Booking
+          {{ loading ? "Processing..." : "Confirm Booking" }}
         </button>
         <button class="btn cancel" @click="closeModal">Cancel</button>
       </div>
@@ -115,8 +115,8 @@ import vnPayImage from "@/assets/vnpay.png";
 import paypalImage from "@/assets/paypal.png";
 import codImage from "@/assets/cod.png";
 import { formatVNDPrice } from "@/utils/currencyUtils";
-import { createBooking } from '@/services/bookingService'; // Adjust path as needed
-import { createVnPayPayment } from '@/services/paymentService'; // Adjust path as needed
+import { createBooking } from "@/services/bookingService"; // Adjust path as needed
+import { createVnPayPayment } from "@/services/paymentService"; // Adjust path as needed
 
 const props = defineProps({
   isVisible: {
@@ -127,11 +127,23 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  guests: {
+    type: Number,
+    required: false, 
+  },
+  checkin: {
+    type: String,
+    required: false,
+  },
+  checkout: {
+    type: String,
+    required: false, 
+  },
 });
 
 const loading = ref(false);
 const showGallery = ref(false);
-// Function to close the gallery modal
+
 const closeGallery = () => {
   showGallery.value = false;
 };
@@ -141,20 +153,19 @@ const totalAmount = computed(() => {
     const checkInDate = new Date(checkin.value);
     const checkOutDate = new Date(checkout.value);
     const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24); // Include both check-in and check-out dates
-    return days * props.homestay.price; // Accessing price directly from props
+    return days * props.homestay.price; 
   }
   return ""; // Return 0 if dates are not valid
 });
 
-// Function to return the corresponding image path based on selected payment method
 const getPaymentImage = (method) => {
   switch (method) {
     case "vnPay":
-      return vnPayImage; // Update with actual image path
+      return vnPayImage;
     case "paypal":
-      return paypalImage; // Update with actual image path
+      return paypalImage; 
     case "cod":
-      return codImage; // Update with actual image path
+      return codImage; 
     default:
       return "";
   }
@@ -162,9 +173,9 @@ const getPaymentImage = (method) => {
 
 const emit = defineEmits(["onClose"]);
 
-const guests = ref("");
-const checkin = ref("");
-const checkout = ref("");
+const guests = ref(props.guests || ""); // Use an empty string if props.guests is not provided
+const checkin = ref(props.checkin || ""); // Default to an empty string if no prop
+const checkout = ref(props.checkout || ""); // Default to an empty string if no prop
 const name = ref("");
 const email = ref("");
 const phone = ref("");
@@ -186,7 +197,7 @@ const handleConfirmBooking = async () => {
       contactName: name.value,
       contactEmail: email.value,
       contactPhone: phone.value,
-      homestayId: props.homestay.id
+      homestayId: props.homestay.id,
     };
 
     // Call the booking service with bookingData
@@ -196,19 +207,20 @@ const handleConfirmBooking = async () => {
     const bankCode = null;
 
     // Step 2: Initiate payment using the bookingId
-    const paymentResponse = await createVnPayPayment(amount, bankCode, bookingId);
+    const paymentResponse = await createVnPayPayment(
+      amount,
+      bankCode,
+      bookingId
+    );
 
-    // Step 3: Redirect to payment URL
-    window.location.href = paymentResponse.data.paymentUrl;
+      window.location.href = paymentResponse.data.paymentUrl;
   } catch (error) {
-    console.error('Error during booking or payment:', error);
-    // Show error message to user
+    console.error("Error during booking or payment:", error);
   } finally {
-    loading.value = false; // Set loading to false when the process finishes
+    loading.value = false; 
   }
 };
 
-  // Here, you can add your logic to send the booking data to your backend
 </script>
 
 <style scoped>
@@ -232,12 +244,12 @@ const handleConfirmBooking = async () => {
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(0.4px); /* Apply a blur effect */
+  backdrop-filter: blur(0.4px); 
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.3s ease; /* Smooth transition */
-  z-index: 5; /* High z-index for the overlay */
+  transition: opacity 0.3s ease; 
+  z-index: 5; 
 }
 
 .modal-content {
@@ -326,10 +338,10 @@ select:focus {
 }
 
 .payment-image img {
-  width: 190px; /* Fixed width */
-  height: 47px; /* Fixed height */
+  width: 190px;
+  height: 47px; 
   margin-left: 36px;
-  object-fit: cover; /* Cover maintains aspect ratio while filling the space */
+  object-fit: cover; 
 }
 
 .image-gallery-overlay {

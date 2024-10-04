@@ -14,9 +14,29 @@
             <img src="@/assets/logo-home.png" alt="Icon" class="button-icon" />
             Explore Homestays
           </button>
-          <button @click="promptSignIn" class="btn-primary">
+          <button
+            v-if="!isAuthenticated"
+            @click="promptSignIn"
+            class="btn-primary"
+          >
             <img src="@/assets/sign-up.png" alt="Icon" class="button-icon" />
             Sign Up / Sign In for Booking
+          </button>
+          <button
+            v-if="isAuthenticated"
+            @click="goToTopRated"
+            class="btn-primary"
+          >
+            <img src="@/assets/toprated.png" alt="Icon" class="button-icon" />
+            Top Rated
+          </button>
+          <button
+            v-if="isAuthenticated"
+            @click="goToTrending"
+            class="btn-primary"
+          >
+            <img src="@/assets/trending.png" alt="Icon" class="button-icon" />
+            Trending
           </button>
         </div>
       </div>
@@ -25,26 +45,113 @@
     <section class="districts">
       <h2>Discover Homestays by District</h2>
       <div class="district-list">
-        <div v-for="district in districts" :key="district.id" class="district-item" @click="filterByDistrict(district)">
-      <img :src="district.image" :alt="district.name" />
-      <p>{{ district.name }}</p>
-    </div>
+        <div
+          v-for="district in districts"
+          :key="district.id"
+          class="district-item"
+          @click="filterByDistrict(district)"
+        >
+          <img :src="district.image" :alt="district.name" />
+          <p>{{ district.name }}</p>
+        </div>
       </div>
     </section>
 
-    <!-- <section class="top-rated">
+    <section id="top-rated" class="top-rated">
       <h2>Top Rated Homestays</h2>
-      <div class="homestay-list">
-        <div v-for="homestay in topRatedHomestays" :key="homestay.id" class="homestay-item">
-          <img :src="homestay.image" :alt="homestay.name" />
+
+      <div class="special-homestays">
+        <!-- First special homestay -->
+        <div v-if="topRatedHomestays.length > 0" class="homestay-item special">
+          <img
+            v-if="
+              topRatedHomestays[0].images &&
+              topRatedHomestays[0].images.length > 0
+            "
+            :src="topRatedHomestays[0].images[0].url"
+            alt="Homestay Avatar"
+            class="special-homestay-img"
+          />
+          <img v-else src="@/assets/default.png" alt="Default Homestay Icon" />
           <div class="homestay-info">
-            <h3>{{ homestay.name }}</h3>
-            <p>Rating: {{ homestay.rating }} stars</p>
-            <p>{{ homestay.reviewCount }} reviews</p>
+            <img
+              src="@/assets/medal1.png"
+              alt="Medal Icon"
+              class="medal-icon"
+              style="width: 50px; height: 50px; margin-bottom: 9px"
+            />
+            <h3>{{ topRatedHomestays[0].name }}</h3>
+
+            <span class="star-icon">⭐</span>
+            <!-- Replace this with your star icon -->
+            {{ topRatedHomestays[0].rating }} -
+            {{ topRatedHomestays[0].reviewCount }} reviews
+          </div>
+        </div>
+
+        <div v-if="topRatedHomestays.length > 1" class="homestay-item special">
+          <img
+            v-if="
+              topRatedHomestays[1].images &&
+              topRatedHomestays[1].images.length > 0
+            "
+            :src="topRatedHomestays[1].images[0].url"
+            alt="Homestay Avatar"
+            class="special-homestay-img"
+          />
+          <img v-else src="@/assets/default.png" alt="Default Homestay Icon" />
+          <div class="homestay-info">
+            <img
+              src="@/assets/medal2.png"
+              alt="Medal Icon"
+              class="medal-icon"
+              style="width: 50px; height: 50px; margin-bottom: 9px"
+            />
+            <h3>{{ topRatedHomestays[1].name }}</h3>
+            <span class="star-icon">⭐</span>
+            <!-- Replace this with your star icon -->
+            {{ topRatedHomestays[1].rating }} -
+            {{ topRatedHomestays[1].reviewCount }} reviews
           </div>
         </div>
       </div>
-    </section> -->
+
+      <div class="slider-container">
+        <button class="prev-btn" @click="slidePrev">
+          <i class="fas fa-chevron-left"></i>
+          <!-- Left arrow icon -->
+        </button>
+        <div class="homestay-list">
+          <div
+            v-for="homestay in topRatedHomestays.slice(2)"
+            :key="homestay.id"
+            class="homestay-item"
+          >
+            <img
+              v-if="homestay.images && homestay.images.length > 0"
+              :src="homestay.images[0].url"
+              alt="Homestay Avatar"
+              
+            />
+            <img
+              v-else
+              src="@/assets/default.png"
+              alt="Default Homestay Icon"
+            />
+            <div class="homestay-info">
+              <h3>{{ homestay.name }}</h3>
+              <span class="star-icon">⭐</span>
+              <!-- Replace this with your star icon -->
+              {{ homestay.rating }} - {{ homestay.reviewCount }} reviews
+            </div>
+          </div>
+        </div>
+        <button class="next-btn" @click="slideNext">
+          <i class="fas fa-chevron-right"></i>
+          <!-- Right arrow icon -->
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -52,32 +159,56 @@
 import PAGES from "@/constants/pages";
 import { useRouter } from "vue-router";
 import { DISTRICTS } from "@/constants/districts";
+import { useHomestayUserStore } from "@/stores/homestayUserStore";
+import { onMounted, computed } from "vue";
 
-// Router
+const homestayUserStore = useHomestayUserStore();
+const { fetchTopRatedHomestays } = homestayUserStore;
 const router = useRouter();
-const districts =  DISTRICTS;
+const districts = DISTRICTS;
+const topRatedHomestays = computed(() => homestayUserStore.topRatedHomestays);
 
-
-// const topRatedHomestays = [
-//   { id: 1, name: 'Luxury Homestay', image: 'path/to/luxury.jpg', rating: 4.8, reviewCount: 120 },
-//   { id: 2, name: 'Cozy Homestay', image: 'path/to/cozy.jpg', rating: 4.7, reviewCount: 95 },
-//   { id: 3, name: 'Peaceful Retreat', image: 'path/to/peaceful.jpg', rating: 4.9, reviewCount: 150 }
-// ]
-
-// Navigation methods
 const goToHomestays = () => {
   router.push(PAGES.USER.HOMESTAY);
 };
 
 const promptSignIn = () => {
-  // Logic to prompt sign-in or sign-up
-  router.push(PAGES.LOGIN); // Redirects to the Sign In page
+  router.push(PAGES.LOGIN);
+};
+
+const goToTopRated = () => {
+  document.getElementById("top-rated").scrollIntoView({ behavior: "smooth" });
 };
 
 const filterByDistrict = (district) => {
-  router.push({ name: 'Homestay', params: { districtId: district.id } });
-}
+  router.push({ path: "/homestay", query: { districtId: district.id } }); // Pass districtId as query param
+};
 
+const isAuthenticated = computed(() => {
+  return localStorage.getItem("userRole") !== null; // Adjust the key as per your implementation
+});
+
+onMounted(async () => {
+  await fetchTopRatedHomestays();
+});
+
+let scrollPosition = 0;
+const slidePrev = () => {
+  const slider = document.querySelector(".homestay-list");
+  const slideWidth = slider.clientWidth;
+  scrollPosition -= slideWidth;
+  if (scrollPosition < 0) scrollPosition = 0;
+  slider.scrollTo({ left: scrollPosition, behavior: "smooth" });
+};
+
+const slideNext = () => {
+  const slider = document.querySelector(".homestay-list");
+  const slideWidth = slider.clientWidth;
+  const maxScrollPosition = slider.scrollWidth - slider.clientWidth;
+  scrollPosition += slideWidth;
+  if (scrollPosition > maxScrollPosition) scrollPosition = maxScrollPosition;
+  slider.scrollTo({ left: scrollPosition, behavior: "smooth" });
+};
 </script>
 
 <style scoped>
@@ -150,7 +281,7 @@ const filterByDistrict = (district) => {
 .districts {
   text-align: center;
   padding: 50px 20px;
-  background-color: #f4f4f4;
+  background-color: #f4eded;
 }
 
 .district-list {
@@ -161,7 +292,7 @@ const filterByDistrict = (district) => {
 
 .district-item {
   cursor: pointer;
-  margin: 20px;
+  margin: 10px;
   text-align: center;
 }
 
@@ -172,40 +303,95 @@ const filterByDistrict = (district) => {
   border-radius: 10px;
 }
 
+.district-item img:hover {
+  transform: scale(1.05); /* Scale up the image */
+}
+
 .district-item p {
-  margin-top: 10px;
+  margin-top: 8px;
   font-weight: bold;
+  font-size: 1.1em;
 }
 
 /* Top Rated Homestays Section */
 .top-rated {
   text-align: center;
   padding: 50px 20px;
+  background-color: #ebe9e7;
+
+}
+
+.special-homestays {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 0px;
+}
+
+.special-homestays .special {
+  flex: 1 1 calc(50% - 16px);
+  box-sizing: border-box;
+  padding: 16x;
+  background-color: #f5e1cee6;
+  border-radius: 36px;
+}
+
+.slider-container {
+  position: relative;
 }
 
 .homestay-list {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  overflow: hidden; 
+  scroll-behavior: smooth;
+}
+
+.homestay-info {
+  margin-top: 15px;
 }
 
 .homestay-item {
-  margin: 20px;
-  text-align: center;
+  flex: 0 0 calc(33.33% - 16px); 
+  box-sizing: border-box;
+  padding: 16px;
+  background-color: #ebe9e7;
+  transition: transform 0.3s ease;
+  margin-right: 16px;
 }
 
 .homestay-item img {
-  width: 250px;
-  height: 180px;
+  width: 84%;
+  height: 200px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a modern look */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
 }
 
-.homestay-info h3 {
-  margin-top: 10px;
+.special-homestay-img {
+  height: 260px !important;
+  object-position: center 74%; /* Adjust the position to pull the image down */
 }
 
-.homestay-info p {
-  margin: 5px 0;
+.prev-btn,
+.next-btn {
+  position: absolute;
+  top: 42%;
+  transform: translateY(-50%);
+  background-color: #362210;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 1;
+  border-radius: 14px;
+}
+
+.prev-btn {
+  left: -6px;
+}
+
+.next-btn {
+  right: 10px;
 }
 </style>
