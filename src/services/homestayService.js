@@ -1,6 +1,6 @@
 import axiosInstance from '@/plugins/axios';
 
-const API_HOMESTAY = '/homestays'; // Adjust according to your backend API
+const API_HOMESTAY = '/homestays'; 
 
 export const fetchHomestays = (page = 1, size = 5) => {
   return axiosInstance.get(API_HOMESTAY, {

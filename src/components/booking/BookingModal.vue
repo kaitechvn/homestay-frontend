@@ -152,7 +152,7 @@ const totalAmount = computed(() => {
   if (checkin.value && checkout.value) {
     const checkInDate = new Date(checkin.value);
     const checkOutDate = new Date(checkout.value);
-    const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24); // Include both check-in and check-out dates
+    const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24);
     return days * props.homestay.price; 
   }
   return ""; // Return 0 if dates are not valid
@@ -173,9 +173,9 @@ const getPaymentImage = (method) => {
 
 const emit = defineEmits(["onClose"]);
 
-const guests = ref(props.guests || ""); // Use an empty string if props.guests is not provided
-const checkin = ref(props.checkin || ""); // Default to an empty string if no prop
-const checkout = ref(props.checkout || ""); // Default to an empty string if no prop
+const guests = ref(props.guests || ""); 
+const checkin = ref(props.checkin || ""); 
+const checkout = ref(props.checkout || ""); 
 const name = ref("");
 const email = ref("");
 const phone = ref("");
@@ -187,7 +187,7 @@ function closeModal() {
 
 // Define methods directly
 const handleConfirmBooking = async () => {
-  loading.value = true; // Set loading to true when the process starts
+  loading.value = true; 
   try {
     // Step 1: Create the booking request body
     const bookingData = {

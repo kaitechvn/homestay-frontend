@@ -36,9 +36,32 @@
           />
 
           <button class="arrow-button" @click="nextImage">&gt;</button>
-          <button class="show-all-button" @click="showAllPhotos">
+          <button
+            class="show-all-button"
+            v-if="homestay.images && homestay.images.length > 0"
+            @click="showGallery = true"
+          >
             Show All Photos
           </button>
+        </div>
+
+        <div
+          v-if="showGallery"
+          class="image-gallery-overlay"
+          @click.self="closeGallery"
+        >
+          <div class="image-gallery-modal">
+            <button @click="closeGallery" class="close-button">Close</button>
+            <div class="image-gallery">
+              <img
+                v-for="(image, index) in homestay.images"
+                :key="index"
+                :src="image.url"
+                alt="Homestay Image"
+                class="gallery-image"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -54,78 +77,82 @@
         </ul>
       </div>
 
-      <div class="reviews-section">
-        <h2>Ratings & Reviews</h2>
-        <div class="rating">
-          <span>Rating: {{ homestay.rating }} / 5</span>
-        </div>
-        <ul>
-          <li v-for="(review, index) in homestay.reviews" :key="index">
-            <strong>{{ review.user }}:</strong> {{ review.comment }}
-          </li>
-        </ul>
+      
+      <div v-if="homestay.id">
+        <Review :homestayId="homestay.id" />
       </div>
     </div>
 
     <!-- Payment Section -->
     <div class="payment-section card">
-    <h2 class="payment-title">Payment</h2>
+      <h2 class="payment-title">Payment</h2>
 
-    <!-- Homestay Price and Currency -->
-    <div class="price-section">
-      <span class="label">Price: </span>
-      <strong class="price">
-        {{ priceFormatter(homestay.price) }}
-        {{
-          currencyStore.currentCurrency === "VND"
-            ? "VND/night"
-            : currencyStore.currentCurrency === "USD"
-            ? "USD/night"
-            : currencyStore.currentCurrency === "JPY"
-            ? "JPY/night"
-            : ""
-        }}
-      </strong>
+      <!-- Homestay Price and Currency -->
+      <div class="price-section">
+        <span class="label">Price: </span>
+        <strong class="price">
+          {{ priceFormatter(homestay.price) }}
+          {{
+            currencyStore.currentCurrency === "VND"
+              ? "VND/night"
+              : currencyStore.currentCurrency === "USD"
+              ? "USD/night"
+              : currencyStore.currentCurrency === "JPY"
+              ? "JPY/night"
+              : ""
+          }}
+        </strong>
+      </div>
+
+      <!-- Guests Input -->
+      <div class="form-group">
+        <label for="guests">Guests:</label>
+        <input
+          type="number"
+          v-model="guests"
+          id="guests"
+          min="1"
+          class="input-field"
+        />
+      </div>
+
+      <!-- Check-in Input -->
+      <div class="form-group">
+        <label for="checkin">Check-in:</label>
+        <input type="date" v-model="checkin" id="checkin" class="input-field" />
+      </div>
+
+      <!-- Check-out Input -->
+      <div class="form-group">
+        <label for="checkout">Check-out:</label>
+        <input
+          type="date"
+          v-model="checkout"
+          id="checkout"
+          class="input-field"
+        />
+      </div>
+
+      <!-- Total Amount -->
+      <div class="total-amount-section">
+        <p class="total-label">Total Amount:</p>
+        <p class="total-price">
+          {{ priceFormatter(totalAmount) }}
+          {{
+            currencyStore.currentCurrency === "VND"
+              ? "VND"
+              : currencyStore.currentCurrency === "USD"
+              ? "USD"
+              : currencyStore.currentCurrency === "JPY"
+              ? "JPY"
+              : ""
+          }}
+        </p>
+      </div>
+
+      <!-- Book Now Button -->
+      <button class="btn-primary" @click="showBookingModal">Book Now</button>
     </div>
-
-    <!-- Guests Input -->
-    <div class="form-group">
-      <label for="guests">Guests:</label>
-      <input type="number" v-model="guests" id="guests" min="1" class="input-field" />
-    </div>
-
-    <!-- Check-in Input -->
-    <div class="form-group">
-      <label for="checkin">Check-in:</label>
-      <input type="date" v-model="checkin" id="checkin" class="input-field" />
-    </div>
-
-    <!-- Check-out Input -->
-    <div class="form-group">
-      <label for="checkout">Check-out:</label>
-      <input type="date" v-model="checkout" id="checkout" class="input-field" />
-    </div>
-
-    <!-- Total Amount -->
-    <div class="total-amount-section">
-      <p class="total-label">Total Amount:</p>
-      <p class="total-price">
-        {{ priceFormatter(totalAmount) }}
-        {{
-          currencyStore.currentCurrency === "VND"
-            ? "VND"
-            : currencyStore.currentCurrency === "USD"
-            ? "USD"
-            : currencyStore.currentCurrency === "JPY"
-            ? "JPY"
-            : ""
-        }}
-      </p>
-    </div>
-
-    <!-- Book Now Button -->
-    <button class="btn-primary" @click="showBookingModal">Book Now</button>
-  </div>
 
     <BookingModal
       v-if="isModalVisible"
@@ -161,6 +188,7 @@ import { useHomestayUserStore } from "@/stores/homestayUserStore";
 import BookingModal from "@/components/booking/BookingModal.vue";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { fetchExchangeRate, formattedPrice } from "@/utils/currencyUtils";
+import Review from "@/components/Review.vue";
 
 const currencyStore = useCurrencyStore();
 const exchangeRate = ref(0);
@@ -281,8 +309,11 @@ const prevImage = () => {
       ];
   }
 };
-const showAllPhotos = () => {
-  isModalOpen.value = true;
+
+const showGallery = ref(false);
+
+const closeGallery = () => {
+  showGallery.value = false;
 };
 
 const closeModal = () => {
@@ -472,7 +503,6 @@ const priceFormatter = (price) => {
   font-weight: bold;
 }
 
-
 .label {
   color: #555;
   font-size: 16px;
@@ -539,5 +569,54 @@ h2 {
 ul {
   list-style-type: none;
   padding: 0;
+}
+
+.image-gallery-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10; /* Make sure the modal is on top */
+}
+
+.image-gallery-modal {
+  background: rgb(243, 237, 237);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 95%; /* Increased width */
+  max-height: 95%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  background: #da8946;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Gallery styles inside the modal */
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gallery-image {
+  width: 280px; /* Increased image width */
+  height: 250px;
+  object-fit: cover;
+  border-radius: 5px;
 }
 </style>

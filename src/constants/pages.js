@@ -21,7 +21,8 @@ const PAGES = {
     HOMESTAY: '/homestay',
     SETTINGS: '/settings',
     BOOKING: '/booking',
-    BOOKING_SUCCESS: '/booking-success'
+    BOOKING_SUCCESS: '/booking-success',
+    PAYMENT_FAILED: '/payment-failed'
   },
 
   HOST: {

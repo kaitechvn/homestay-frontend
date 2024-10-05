@@ -15,6 +15,7 @@ import Homestay from "@/pages/user/Homestay.vue";
 import NotFound from "@/pages/exception/NotFound.vue";
 import BookingManagement from "@/pages/admin/BookingManagement.vue";
 import BookingSuccess from "@/components/booking/BookingSuccess.vue";
+import PaymentFailed from "@/components/booking/PaymentFailed.vue";
 
 const routes = [
 
@@ -39,20 +40,10 @@ const routes = [
   },
 
   // USER routes
-  {
-    path: PAGES.USER.HOMESTAY, name: 'Homestay', component: Homestay
-  },
-
-  {
-    path: '/homestay/:id',
-    name: 'HomestayDetail',
-    component: HomestayDetails,
-  },
-
-  {
-    path: PAGES.USER.BOOKING_SUCCESS,
-    component: BookingSuccess
-  },
+  { path: PAGES.USER.HOMESTAY, name: 'Homestay', component: Homestay },
+  { path: '/homestay/:id', name: 'HomestayDetail', component: HomestayDetails },
+  { path: PAGES.USER.BOOKING_SUCCESS, component: BookingSuccess},
+  { path: PAGES.USER.PAYMENT_FAILED, component: PaymentFailed},
 
   // Catch-all route for undefined paths
   {

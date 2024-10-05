@@ -48,7 +48,6 @@ export const useHomestayUserStore = defineStore('homestayUser', {
 
     async fetchHomestayDetail(homestayId) {
       try {
-        console.log("abc")
         const response = await fetchHomestayDetailById(homestayId);
         this.homestayDetail = response.data.data;
         console.log('Homestay details fetched:', this.homestayDetail);
