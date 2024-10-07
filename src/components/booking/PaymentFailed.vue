@@ -43,9 +43,10 @@ import { createVnPayPayment } from "@/services/paymentService";
 const router = useRouter();
 const route = useRoute();
 const showModal = ref(false);
-const bookingId = Number(route.query.bookingId);
+const bookingId = route.query.bookingId;
+const amount = route.query.amount;
+const bankCode = null;
 
-// Method to handle returning home
 const goHome = () => {
   router.push(PAGES.HOME);
 };
@@ -58,7 +59,7 @@ const cancel = () => {
       alert("Booking has been canceled successfully.");
 
       setTimeout(() => {
-        router.push(PAGES.USER.HOMESTAY);
+        router.push(PAGES.USER.BOOKING);
       }, 2000);
     })
     .catch((error) => {
@@ -76,11 +77,17 @@ const closeModal = () => {
   showModal.value = false;
 };
 
-const selectPaymentMethod = (method) => {
+const selectPaymentMethod = async (method) => {
   closeModal();
 
   if (method === "vnpay") {
-   createVnPayPayment(bookingId);
+    const paymentResponse = await createVnPayPayment(
+      amount,
+      bankCode,
+      bookingId
+    );
+
+    window.location.href = paymentResponse.data.paymentUrl;
   } else if (method === "momo") {
     router.push(`/retry-payment/momo`);
   } else if (method === "paypal") {

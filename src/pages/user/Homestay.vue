@@ -229,8 +229,8 @@ const getExchangeRate = async () => {
 
 const route = useRoute();
 const router = useRouter();
-const currencyStore = useCurrencyStore(); 
-const exchangeRate = ref(0); 
+const currencyStore = useCurrencyStore();
+const exchangeRate = ref(0);
 const homestayUserStore = useHomestayUserStore();
 const currentPage = computed(() => homestayUserStore.currentPage);
 const totalPages = computed(() => homestayUserStore.totalPages);
@@ -297,26 +297,24 @@ const openBookingModal = (homestay) => {
   isModalVisible.value = true;
 };
 
-
 const closeBookingModal = () => {
   isModalVisible.value = false;
   clearSelectedHomestay();
 };
 
 const viewDetails = (homestay) => {
-  router.push({ name: 'HomestayDetail', params: { id: homestay.id } }).then(() => {
-    window.scrollTo(0, 0); // Scroll to the top of the page
-  });
+  router.push({ name: "HomestayDetail", params: { id: homestay.id } });
 };
+
 const loadHomestays = (newPage) => {
-  filters.value.page = newPage; 
-  filterHomestays(filters.value); 
+  filters.value.page = newPage;
+  filterHomestays(filters.value);
 };
 
 function openMap(homestay) {
-  const location = encodeURIComponent(`${homestay.name} ${homestay.address}`); 
+  const location = encodeURIComponent(`${homestay.name} ${homestay.address}`);
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${location}`;
-  window.open(googleMapsUrl, "_blank"); 
+  window.open(googleMapsUrl, "_blank");
 }
 
 const selectedPriceRange = ref("");
@@ -336,8 +334,6 @@ const updatePriceRange = () => {
     filters.value.maxPrice = null;
   }
 };
-
-
 </script>
 
 <style scoped>

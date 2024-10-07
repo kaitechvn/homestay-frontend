@@ -9,7 +9,7 @@
       </div>
       <div class="days-of-week">
         <div v-for="day in daysOfWeek" :key="day" class="day-header">
-          {{ day }}
+          {{ $t(`day_of_week.${day}`) }}
         </div>
       </div>
       <div class="days-grid">
@@ -23,15 +23,15 @@
             locked: isDisabled(day).isLocked,
             unlocking: isUnlocking(day),
           }"
-          @click="toggleDate(day)"
+          @click="!disabled ? toggleDate(day) : null"
           :disabled="isDisabled(day)"
         >
           {{ day }}
         </div>
       </div>
     </div>
-    <div class="button-container">
-      <button @click="lockDates" class="lock-button">Lock</button>
+    <div v-if="!disabled" class="button-container">
+      <button  @click="lockDates" class="lock-button">Lock</button>
       <button @click="unlockDates" class="unlock-button">Unlock</button>
       <button @click="close" class="close-button">Close</button>
     </div>
@@ -40,7 +40,7 @@
 
 
 <script setup>
-import { ref, computed} from "vue";
+import { ref, computed } from "vue";
 import { useHomestayStore } from "@/stores/homestayAdminStore";
 
 const homestayStore = useHomestayStore();
@@ -49,11 +49,15 @@ const emit = defineEmits(["select-dates", "close", "reopenDatePicker"]);
 const props = defineProps({
   lockedDates: {
     type: Array,
-    default: () => [], 
+    default: () => [],
   },
   homestayId: {
     type: Number,
     required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -78,19 +82,17 @@ const monthNames = [
 
 const currentMonth = ref(currentDate.value.getMonth());
 const currentYear = ref(currentDate.value.getFullYear());
-const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const daysOfWeek = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 const daysInMonth = computed(() => {
   const start = new Date(currentYear.value, currentMonth.value, 1);
   const end = new Date(currentYear.value, currentMonth.value + 1, 0);
   const days = [];
 
-  // Add leading empty days
   for (let i = 0; i < start.getDay(); i++) {
     days.push("");
   }
 
-  // Add actual days of the month
   for (let i = 1; i <= end.getDate(); i++) {
     days.push(i);
   }
@@ -106,14 +108,11 @@ const isDisabled = (day) => {
     .toString()
     .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
 
-  // Check if the date is in the past
   const isPastDate = dateToCheck < new Date();
 
-  // Check if the date is locked
   const isLockedDate =
     props.lockedDates && props.lockedDates.includes(dateString);
 
-  // Return the disabled status
   return {
     isDisabled: isPastDate || isLockedDate,
     isLocked: isLockedDate,
@@ -166,7 +165,7 @@ async function lockDates() {
   try {
     const datesToLock = Array.from(selectedDates.value);
     await homestayStore.addLockDate(props.homestayId, datesToLock);
-    emit('reopenDatePicker'); // Emit to notify parent to reopen date picker
+    emit("reopenDatePicker"); // Emit to notify parent to reopen date picker
 
     selectedDates.value.clear(); // Clear after locking
   } catch (error) {
@@ -174,7 +173,6 @@ async function lockDates() {
   }
 }
 
-// Remove
 const unlockDates = async () => {
   try {
     const datesToUnlock = Array.from(selectedUnlockDates.value); // Collect selected unlock dates into an array
@@ -182,13 +180,13 @@ const unlockDates = async () => {
       console.error("No dates selected to unlock."); // Check if any dates are selected
       return; // Early return if no dates are selected
     }
-    // Call the store method to remove the list of unlock dates
-    await homestayStore.removeLockDate(props.homestayId, datesToUnlock);
-    emit('reopenDatePicker'); // Emit to notify parent to reopen date picker
 
-    selectedUnlockDates.value.clear(); // Clear selected unlock dates after unlocking
+    await homestayStore.removeLockDate(props.homestayId, datesToUnlock);
+    emit("reopenDatePicker"); 
+
+    selectedUnlockDates.value.clear(); 
   } catch (error) {
-    console.error("Failed to unlock dates:", error); // Log any errors
+    console.error("Failed to unlock dates:", error); 
   }
 };
 

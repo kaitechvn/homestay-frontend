@@ -13,11 +13,14 @@ export const useBookingAdminStore = defineStore('booking', {
     selectedBooking: null,
     currentPage: 1,
     totalPages: 1,
+    selectedStatus: null, 
   }),
   actions: {
-    async loadBookings(page = 1, size = 5) {
+    async loadBookings(page = 1, size = 5, status = null) {
+
       try {
-        const response = await fetchBookings(page, size);
+        // Fetch bookings with optional status filter
+        const response = await fetchBookings(page, size, status);
         console.log(response.data);
         this.bookings = response.data.data.data;
         this.currentPage = response.data.data.currentPage;
@@ -67,12 +70,24 @@ export const useBookingAdminStore = defineStore('booking', {
       }
     },
 
+    filterByStatus(status) {
+      this.selectedStatus = status; 
+      this.currentPage = 1;
+      this.loadBookings(this.currentPage, 5, status); 
+    },
+
     setSelectedBooking(booking) {
       this.selectedBooking = booking;
+      console.log(this.selectedBooking);
     },
 
     clearSelectedBooking() {
       this.selectedBooking = null;
+    },
+
+    handlePageChange(newPage) {
+      this.currentPage = newPage; 
+      this.loadBookings(newPage, 5, this.selectedStatus); 
     },
   },
 });

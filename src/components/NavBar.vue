@@ -28,9 +28,14 @@
               >Homestay</router-link
             >
           </li>
-          <li class="nav-item">
+          <li v-if="isLoggedIn" class="nav-item">
             <router-link class="nav-link mx-2" to="/booking"
               >Booking</router-link
+            >
+          </li>
+          <li v-if="!isLoggedIn" class="nav-item">
+            <router-link class="nav-link mx-2" to="/contact-us"
+              >Contact</router-link
             >
           </li>
           <li class="nav-item">
@@ -249,8 +254,6 @@ function logout() {
   authStore.logout();
 }
 
-
-
 // Function to initialize local storage values
 function initializeLocalStorage() {
   if (!localStorage.getItem("selectedLanguage")) {
@@ -279,8 +282,8 @@ onMounted(() => {
   }
 
   if (savedCurrency) {
-  currencyStore.setCurrency(savedCurrency); // Use store's setter method to update the currency
-}
+    currencyStore.setCurrency(savedCurrency); // Use store's setter method to update the currency
+  }
 
   // Ensure that the user's role and mode are initialized from local storage
   const savedRole = localStorage.getItem("userRole");

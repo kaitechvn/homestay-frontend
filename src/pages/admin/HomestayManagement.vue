@@ -598,17 +598,17 @@ onMounted(async () => {
 }
 
 .close-button-img {
-  position: absolute; /* Absolute positioning */
-  top: 20px; /* Distance from the top */
-  right: 20px; /* Distance from the right */
-  font-size: 24px; /* Increase font size for visibility */
-  color: white; /* Button text color */
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  border: none; /* No border */
-  border-radius: 50%; /* Rounded button */
-  padding: 5px 10px; /* Padding for the button */
-  cursor: pointer; /* Change cursor on hover */
-  z-index: 1001; /* Ensure it appears above the image */
+  position: absolute; 
+  top: 20px; 
+  right: 20px; 
+  font-size: 24px; 
+  color: white; 
+  background: rgba(0, 0, 0, 0.5); 
+  border: none; 
+  border-radius: 50%; 
+  padding: 5px 10px; 
+  cursor: pointer; 
+  z-index: 1001; 
 }
 
 .close-button-img:hover {

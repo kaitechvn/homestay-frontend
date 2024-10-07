@@ -130,15 +130,27 @@
     "add": "Add",
     "cancel": "Cancel",
     "detail-status": {
-      "pending": "Pending",
-      "confirmed": "Confirmed",
-      "cancelled": "Cancelled"
-    }
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "CANCELLED": "Cancelled"
+    },
+    "confirm": "Confirm"
   },
-      
+
   "messages": {
     "add-success": "Created successfully",
     "update-sucess": "Updated successfully",
     "delete-success": "Deleted successfully"
-  }
+  },
+
+"day_of_week": {
+  "sun": "Sun",
+  "mon": "Mon",
+  "tue": "Tue",
+  "wed": "Wed",
+  "thu": "Thu",
+  "fri": "Fri",
+  "sat": "Sat"
+}
+
 }

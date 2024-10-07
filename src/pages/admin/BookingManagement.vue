@@ -3,6 +3,14 @@
     <div class="booking-list">
       <div class="header-container">
         <h2 class="header-title">{{ $t("booking-management.title") }}</h2>
+
+        <div class="status-filter">
+          <button @click="filterByStatus(null)">All</button>
+          <button @click="filterByStatus('PENDING')">Pending</button>
+          <button @click="filterByStatus('CONFIRMED')">Confirmed</button>
+          <button @click="filterByStatus('CANCELLED')">Cancelled</button>
+        </div>
+
         <div class="right-container">
           <div class="success-message" v-if="successMessage">
             {{ successMessage }}
@@ -33,7 +41,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booking in bookings" :key="booking.id">
+          <tr v-for="booking in bookings" :key="booking.bookingId">
             <td class="text-center">{{ booking.bookingId }}</td>
             <td>{{ booking.contactName }}</td>
             <td>{{ booking.contactEmail }}</td>
@@ -47,14 +55,13 @@
             <td class="text-center">
               <span
                 v-if="booking.status === 'PENDING'"
-                @click="toggleDropdown"
+                @click="toggleDropdown(booking.bookingId, $event)"
                 class="badge badge-pending"
                 style="cursor: pointer"
               >
-                {{ booking.status }}
+                {{ $t(`booking-management.detail-status.${booking.status}`) }}
               </span>
 
-              <!-- For other statuses (CONFIRMED, CANCELLED) without click functionality -->
               <span
                 v-else
                 :class="{
@@ -62,15 +69,18 @@
                   'badge badge-cancelled': booking.status === 'CANCELLED',
                 }"
               >
-                {{ booking.status }}
-              </span>
+              {{ $t(`booking-management.detail-status.${booking.status}`) }}
+            </span>
               <div
-                v-if="isDropdownVisible && booking.status === 'PENDING'"
+                v-if="
+                  isDropdownVisible(booking.bookingId) &&
+                  booking.status === 'PENDING'
+                "
                 class="dropdown"
               >
                 <ul>
-                  <li @click="confirm(booking.bookingId)">CONFIRMED</li>
-                  <li @click="cancel(booking.bookingId)">CANCELLED</li>
+                  <li @click="confirmBooking(booking.bookingId)">{{ $t("booking-management.confirm") }}</li>
+                  <li @click="cancelBooking(booking.bookingId)">{{ $t("booking-management.cancel") }}</li>
                 </ul>
               </div>
             </td>
@@ -96,7 +106,7 @@
       <pagination
         :current-page="currentPage"
         :total-pages="totalPages"
-        @page-changed="loadBookings"
+        @page-changed="handlePageChange"
       />
     </div>
 
@@ -208,9 +218,9 @@
   </div>
 </template>
   
-  <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useBookingAdminStore } from "@/stores/bookingAdminStore"; // Assuming you have a booking store
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useBookingAdminStore } from "@/stores/bookingAdminStore";
 import Pagination from "@/components/Pagination.vue";
 import { useI18n } from "vue-i18n";
 
@@ -220,16 +230,17 @@ const bookings = computed(() => bookingStore.bookings);
 const selectedBooking = computed(() => bookingStore.selectedBooking);
 const currentPage = computed(() => bookingStore.currentPage);
 const totalPages = computed(() => bookingStore.totalPages);
-const isDropdownVisible = ref(false);
 
 const {
   loadBookings,
   addBooking,
   removeBooking,
+  filterByStatus,
   setSelectedBooking,
   clearSelectedBooking,
   confirm,
   cancel,
+  handlePageChange,
 } = bookingStore;
 
 const isEditing = computed(() => !!selectedBooking.value);
@@ -303,8 +314,19 @@ const closeModal = () => {
   showModal.value = false;
 };
 
-const toggleDropdown = () => {
-  isDropdownVisible.value = !isDropdownVisible.value;
+const activeDropdownBookingId = ref(null);
+
+const toggleDropdown = (bookingId, event) => {
+  if (activeDropdownBookingId.value === bookingId) {
+    activeDropdownBookingId.value = null;
+  } else {
+    activeDropdownBookingId.value = bookingId;
+  }
+  event.stopPropagation();
+};
+
+const isDropdownVisible = (bookingId) => {
+  return activeDropdownBookingId.value === bookingId;
 };
 
 const confirmBooking = (bookingId) => {
@@ -313,17 +335,28 @@ const confirmBooking = (bookingId) => {
   });
 };
 
-// Method to cancel booking
 const cancelBooking = (bookingId) => {
   cancel(bookingId).then(() => {
     showDropdown.value = false;
   });
 };
 
+const handleClickOutside = (event) => {
+  const dropdownElement = document.querySelector(".dropdown");
+  if (dropdownElement && !dropdownElement.contains(event.target)) {
+    activeDropdownBookingId.value = null; // Close the dropdown if clicked outside
+  }
+};
+
 onMounted(async () => {
+  window.addEventListener("click", handleClickOutside);
   const savedPage = localStorage.getItem("currentPage");
   const pageToLoad = savedPage ? parseInt(savedPage, 10) : 1;
   await loadBookings(pageToLoad);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("click", handleClickOutside);
 });
 </script>
   
@@ -336,8 +369,8 @@ onMounted(async () => {
 
 .header-container {
   display: flex;
-  align-items: center; 
-  justify-content: space-between; 
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-title {
@@ -486,7 +519,25 @@ onMounted(async () => {
   background-color: #f0f0f0; /* Change color on hover */
 }
 
-/* Keyframes for success message animation */
+.status-filter {
+  display: flex;
+  gap: 10px;
+  margin-right: 240px;
+}
+
+.status-filter button {
+  padding: 8px 12px;
+  border: none;
+  background-color: #7e7a43;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.status-filter button:hover {
+  background-color: #7e5815d2;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

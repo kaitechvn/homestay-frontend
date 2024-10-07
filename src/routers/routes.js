@@ -16,6 +16,7 @@ import NotFound from "@/pages/exception/NotFound.vue";
 import BookingManagement from "@/pages/admin/BookingManagement.vue";
 import BookingSuccess from "@/components/booking/BookingSuccess.vue";
 import PaymentFailed from "@/components/booking/PaymentFailed.vue";
+import Booking from "@/pages/user/Booking.vue";
 
 const routes = [
 
@@ -42,6 +43,7 @@ const routes = [
   // USER routes
   { path: PAGES.USER.HOMESTAY, name: 'Homestay', component: Homestay },
   { path: '/homestay/:id', name: 'HomestayDetail', component: HomestayDetails },
+  { path: PAGES.USER.BOOKING, component: Booking},
   { path: PAGES.USER.BOOKING_SUCCESS, component: BookingSuccess},
   { path: PAGES.USER.PAYMENT_FAILED, component: PaymentFailed},
 
@@ -56,6 +58,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition; // Scroll to saved position (for browser's forward/back buttons)
+    } else {
+      return { top: 0 }; // Always scroll to the top
+    }
+  },
 });
 
 export default router;

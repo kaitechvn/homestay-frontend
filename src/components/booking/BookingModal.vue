@@ -56,6 +56,7 @@
               <label for="checkout">Check-Out Date:</label>
               <input type="date" v-model="checkout" required />
             </div>
+            
             <div class="form-group">
               <label for="paymentMethod">Payment Method:</label>
               <select v-model="paymentMethod" required>
@@ -155,7 +156,7 @@ const totalAmount = computed(() => {
     const days = (checkOutDate - checkInDate) / (1000 * 3600 * 24);
     return days * props.homestay.price; 
   }
-  return ""; // Return 0 if dates are not valid
+  return ""; 
 });
 
 const getPaymentImage = (method) => {
@@ -185,7 +186,6 @@ function closeModal() {
   emit("onClose");
 }
 
-// Define methods directly
 const handleConfirmBooking = async () => {
   loading.value = true; 
   try {
@@ -227,7 +227,7 @@ const handleConfirmBooking = async () => {
 .header-container {
   display: flex;
   align-items: center;
-  gap: 10px; /* Adjust the gap between the image and the title */
+  gap: 10px; 
 }
 
 .homestay-header-image {
@@ -235,7 +235,7 @@ const handleConfirmBooking = async () => {
   height: 100px;
   border-radius: 8px;
   object-fit: cover;
-  cursor: pointer; /* Make the image clickable */
+  cursor: pointer; 
 }
 
 .modal-overlay {
@@ -253,13 +253,13 @@ const handleConfirmBooking = async () => {
 }
 
 .modal-content {
-  background: rgba(225, 221, 218, 0.9); /* Slightly opaque background */
+  background: rgba(225, 221, 218, 0.9); 
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 600px; /* Adjusted max-width for better sizing */
-  border: 2px solid #1c0707; /* Add a colored border */
+  max-width: 600px; 
+  border: 2px solid #1c0707; 
 }
 
 .modal-title {
