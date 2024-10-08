@@ -112,7 +112,7 @@
                   />
                 </button>
                 <button
-                  @click="processPayment(booking.bookingId)"
+                  @click="processPayment(booking.totalAmount, booking.bookingId)"
                   title="Process Payment"
                 >
                   <img
@@ -144,19 +144,22 @@
 </template>
   
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useLanguageStore } from "@/stores/languageStore"; // Import your language store
+import { ref, computed, onMounted } from "vue";
 import { useBookingUserStore } from "@/stores/bookingUserStore";
 import Pagination from "@/components/Pagination.vue";
 import ContactModal from "@/components/booking/ContactModal.vue";
-import { useI18n } from "vue-i18n";
 import { downloadPdfBill } from "@/services/pdfService";
+import { createVnPayPayment } from "@/services/paymentService";
 
-const { t } = useI18n();
 const bookingStore = useBookingUserStore();
 const bookings = computed(() => bookingStore.bookings);
 const currentPage = computed(() => bookingStore.currentPage);
 const totalPages = computed(() => bookingStore.totalPages);
 const propBooking = computed(() => bookingStore.selectedBooking);
+const languageStore = useLanguageStore();
+
+const selectedLanguage = computed(() => languageStore.selectedLanguage);
 
 const {
   loadBookings,
@@ -168,12 +171,14 @@ const {
 } = bookingStore;
 
 const generatePdf = async (bookingId) => {
+  const lang = selectedLanguage.value;
+
   try {
-    const response = await downloadPdfBill(bookingId);
+    const response = await downloadPdfBill(bookingId, lang);
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `bill-${bookingId}.pdf`);
+    link.setAttribute("download", `bill-${lang}-${bookingId}.pdf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -182,10 +187,12 @@ const generatePdf = async (bookingId) => {
   }
 };
 
-const handleClickOutside = (event) => {
-  const dropdownElement = document.querySelector(".dropdown");
-  if (dropdownElement && !dropdownElement.contains(event.target)) {
-    activeDropdownBookingId.value = null;
+const processPayment = async (amount, bookingId) => {
+  try {
+    const paymentResponse = await createVnPayPayment(amount, bookingId);
+    window.location.href = paymentResponse.data.paymentUrl;
+  } catch (error) {
+    console.error("Failed to retry payment:", error);
   }
 };
 
@@ -202,14 +209,9 @@ const closeModal = () => {
 };
 
 onMounted(async () => {
-  window.addEventListener("click", handleClickOutside);
   const savedPage = localStorage.getItem("currentPage");
   const pageToLoad = savedPage ? parseInt(savedPage, 10) : 1;
   await loadBookings(pageToLoad);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("click", handleClickOutside);
 });
 </script>
   
@@ -227,11 +229,11 @@ onUnmounted(() => {
 }
 
 .header-title {
-  flex-grow: 1; /* Allow the title to take up remaining space */
+  flex-grow: 1;
 }
 
 .right-container {
-  display: flex; /* Align items in the right container */
+  display: flex;
   align-items: center; /* Center vertically */
 }
 

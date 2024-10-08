@@ -200,16 +200,12 @@ const handleConfirmBooking = async () => {
       homestayId: props.homestay.id,
     };
 
-    // Call the booking service with bookingData
     const bookingResponse = await createBooking(bookingData);
     const bookingId = bookingResponse.data.bookingId;
     const amount = bookingResponse.data.totalAmount;
-    const bankCode = null;
 
-    // Step 2: Initiate payment using the bookingId
     const paymentResponse = await createVnPayPayment(
       amount,
-      bankCode,
       bookingId
     );
 

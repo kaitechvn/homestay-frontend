@@ -69,7 +69,6 @@
       />
     </div>
 
-    <!-- Modal for Homestay Form -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content">
         <h2>
@@ -361,26 +360,25 @@ const reloadHomestayImages = async (homestayId) => {
   }
 };
 
-const isModalOpen = ref(false); // Controls modal visibility
-const modalImage = ref(""); // Stores the image URL to display in the modal
+const isModalOpen = ref(false); 
+const modalImage = ref(""); 
 
-// Method to open the modal and display the selected image
 const openImgDetail = (imageUrl) => {
-  modalImage.value = imageUrl; // Set the clicked image as the modal image
-  isModalOpen.value = true; // Show the modal
+  modalImage.value = imageUrl;
+  isModalOpen.value = true;
 };
 
 // Method to close the modal
 const closeImgDetail = () => {
-  isModalOpen.value = false; // Hide the modal
-  modalImage.value = ""; // Clear the modal image
+  isModalOpen.value = false; 
+  modalImage.value = ""; 
 };
 
 const showDatepickerModal = ref(false);
 const lockDates = ref([]); 
 
 const openDatepicker = async (homestayId) => {
-  selectedHomestayId.value = homestayId; // Set the selected homestay ID
+  selectedHomestayId.value = homestayId;
   showDatepickerModal.value = true;
 
   await loadLockDates(homestayId);
@@ -390,8 +388,7 @@ const openDatepicker = async (homestayId) => {
 };
 
 const reopenDatePicker = () => {
-      // Logic to reopen the date picker
-      openDatepicker(selectedHomestayId.value); // Call the openDatepicker function
+      openDatepicker(selectedHomestayId.value); 
     };
 
 // Method to close the Datepicker modal
@@ -475,7 +472,6 @@ onMounted(async () => {
   margin-top: 20px;
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -486,6 +482,7 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 5; 
 }
 
 .modal-content {

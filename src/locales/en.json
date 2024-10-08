@@ -1,4 +1,17 @@
 {
+    "navbar": {
+      "home": "Home",
+      "homestay": "Homestay",
+      "booking": "Booking",
+      "contact": "Contact",
+      "aboutUs": "About Us",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "profile": "Profile",
+      "logout": "Logout"
+    },
+  
+  
   "login": {
     "sign_in": "Sign in",
     "username": "Username",
@@ -151,6 +164,21 @@
   "thu": "Thu",
   "fri": "Fri",
   "sat": "Sat"
-}
+},
+
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  }
 
 }

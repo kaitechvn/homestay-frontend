@@ -4,7 +4,7 @@
     <div class="calendar">
       <div class="header">
         <button @click="prevMonth" class="nav-button">&lt;</button>
-        <h4>{{ monthNames[currentMonth] }} {{ currentYear }}</h4>
+        <h4>{{ $t(`months.${monthNames[currentMonth]}`)}} {{ currentYear }}</h4>
         <button @click="nextMonth" class="nav-button">&gt;</button>
       </div>
       <div class="days-of-week">
@@ -23,14 +23,14 @@
             locked: isDisabled(day).isLocked,
             unlocking: isUnlocking(day),
           }"
-          @click="!disabled ? toggleDate(day) : null"
+          @click="disabled ? toggleDate(day) : null"
           :disabled="isDisabled(day)"
         >
           {{ day }}
         </div>
       </div>
     </div>
-    <div v-if="!disabled" class="button-container">
+    <div v-if="disabled" class="button-container">
       <button  @click="lockDates" class="lock-button">Lock</button>
       <button @click="unlockDates" class="unlock-button">Unlock</button>
       <button @click="close" class="close-button">Close</button>
@@ -66,18 +66,18 @@ const selectedDates = ref(new Set());
 const selectedUnlockDates = ref(new Set());
 
 const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 const currentMonth = ref(currentDate.value.getMonth());
@@ -165,9 +165,9 @@ async function lockDates() {
   try {
     const datesToLock = Array.from(selectedDates.value);
     await homestayStore.addLockDate(props.homestayId, datesToLock);
-    emit("reopenDatePicker"); // Emit to notify parent to reopen date picker
+    emit("reopenDatePicker"); 
 
-    selectedDates.value.clear(); // Clear after locking
+    selectedDates.value.clear(); 
   } catch (error) {
     console.error("Failed to lock dates:", error);
   }
@@ -175,10 +175,10 @@ async function lockDates() {
 
 const unlockDates = async () => {
   try {
-    const datesToUnlock = Array.from(selectedUnlockDates.value); // Collect selected unlock dates into an array
+    const datesToUnlock = Array.from(selectedUnlockDates.value);
     if (datesToUnlock.length === 0) {
-      console.error("No dates selected to unlock."); // Check if any dates are selected
-      return; // Early return if no dates are selected
+      console.error("No dates selected to unlock."); 
+      return; 
     }
 
     await homestayStore.removeLockDate(props.homestayId, datesToUnlock);
@@ -306,43 +306,42 @@ const close = () => {
 }
 
 .day.selected {
-  background-color: rgba(255, 99, 71, 0.5); /* Light red background */
-  border: 2px solid #ab4736; /* Tomato red border */
-  border-radius: 10px; /* Make it circular */
-  transform: scale(1.05); /* Smaller scale effect */
-  color: white; /* Change text color to white for better contrast */
-  /* Adjust padding for a smaller appearance */
+  background-color: rgba(255, 99, 71, 0.5); 
+  border: 2px solid #ab4736; 
+  border-radius: 10px; 
+  transform: scale(1.05); 
+  color: white; 
 }
 
 .day:not(.selected) {
-  background-color: transparent; /* Neutral background for unselected */
-  border: 1px solid #ccc; /* Light border for unselected days */
-  color: rgba(54, 14, 8, 0.881); /* Default text color */
+  background-color: transparent; 
+  border: 1px solid #ccc;
+  color: rgba(54, 14, 8, 0.881); 
 }
 
 .day.locked {
-  position: relative; /* Ensures the lock icon is positioned relative to the day box */
+  position: relative; 
   background-color: rgba(
     48,
     114,
     49,
     0.868
-  ); /* Softer light orange background */
-  color: #380802; /* Slightly darker text color for contrast */
+  ); 
+  color: #380802; 
   cursor: pointer;
 }
 
 .day.locked::before {
-  content: "\1F512"; /* Unicode for a lock icon */
-  font-size: 20px; /* Adjust size of the lock icon */
+  content: "\1F512"; 
+  font-size: 20px; 
   position: absolute;
-  top: 5px; /* Position the lock icon at the top */
-  right: 0px; /* Position the lock icon at the right */
-  opacity: 0.8; /* Adds some transparency to the lock icon */
+  top: 5px; 
+  right: 0px; 
+  opacity: 0.8; 
 }
 
 .day.unlocking::before {
-  content: "\1F513"; /* Unlock icon */
+  content: "\1F513";
   font-size: 20px;
   position: absolute;
   top: 5px;
@@ -351,7 +350,7 @@ const close = () => {
 }
 
 .day.locked span {
-  visibility: visible; /* Ensure the date number is still visible */
+  visibility: visible; 
 }
 
 .day.disabled {

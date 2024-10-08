@@ -45,7 +45,6 @@ const route = useRoute();
 const showModal = ref(false);
 const bookingId = route.query.bookingId;
 const amount = route.query.amount;
-const bankCode = null;
 
 const goHome = () => {
   router.push(PAGES.HOME);
@@ -81,11 +80,7 @@ const selectPaymentMethod = async (method) => {
   closeModal();
 
   if (method === "vnpay") {
-    const paymentResponse = await createVnPayPayment(
-      amount,
-      bankCode,
-      bookingId
-    );
+    const paymentResponse = await createVnPayPayment(amount, bookingId);
 
     window.location.href = paymentResponse.data.paymentUrl;
   } else if (method === "momo") {

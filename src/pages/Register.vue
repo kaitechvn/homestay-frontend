@@ -35,14 +35,12 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'; // Import useRouter
+import { useRouter } from 'vue-router'; 
 import FirstStepRegister from '@/components/register/FirstStepRegister.vue';
 import SecondStepRegister from '@/components/register/SecondStepRegister.vue';  
 import axiosInstance from '@/plugins/axios';
 
-const { t } = useI18n();
 const router = useRouter(); 
 const errorMessage = ref('');
 const successMessage = ref(''); 

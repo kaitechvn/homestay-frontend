@@ -27,18 +27,14 @@ export const useAuthStore = defineStore('auth', () => {
 
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-      // Decode the token to get the user's role
       const decodedToken = jwtDecode(accessToken);
       console.log(decodedToken);
 
-      // Store the user's role in the store and localStorage
       userRole.value = decodedToken.role;
       console.log(userRole.value);
       localStorage.setItem('userRole', decodedToken.role);
 
-      // Redirect based on user role
       if (userRole.value == 'ADMIN') {
-        console.log('Redirecting to:', PAGES.ADMIN.HOME); // Debug to see the path
         await router.push(PAGES.ADMIN.HOME);
       } else {
         await router.push(PAGES.HOME);

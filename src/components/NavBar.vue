@@ -19,43 +19,44 @@
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item">
-            <router-link class="nav-link mx-2" to="/" aria-current="page"
-              >Home</router-link
-            >
+            <router-link class="nav-link mx-2" to="/" aria-current="page">
+              {{ $t("navbar.home") }}
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link mx-2" to="/homestay"
-              >Homestay</router-link
-            >
+            <router-link class="nav-link mx-2" to="/homestay">
+              {{ $t("navbar.homestay") }}
+            </router-link>
           </li>
           <li v-if="isLoggedIn" class="nav-item">
-            <router-link class="nav-link mx-2" to="/booking"
-              >Booking</router-link
-            >
+            <router-link class="nav-link mx-2" to="/booking">
+              {{ $t("navbar.booking") }}
+            </router-link>
           </li>
           <li v-if="!isLoggedIn" class="nav-item">
-            <router-link class="nav-link mx-2" to="/contact-us"
-              >Contact</router-link
-            >
+            <router-link class="nav-link mx-2" to="/contact-us">
+              {{ $t("navbar.contact") }}
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link mx-2" to="/about-us"
-              >About Us</router-link
-            >
+            <router-link class="nav-link mx-2" to="/about-us">
+              {{ $t("navbar.aboutUs") }}
+            </router-link>
           </li>
           <li class="nav-item d-none d-lg-block">
             <router-link class="nav-link mx-2" to="/">
               <img src="@/assets/logo-navbar.png" height="70" />
             </router-link>
           </li>
-          <!-- Conditionally render links based on user authentication status -->
           <li v-if="!isLoggedIn" class="nav-item">
-            <router-link class="nav-link mx-2" to="/login">Sign In</router-link>
+            <router-link class="nav-link mx-2" to="/login">
+              {{ $t("navbar.signIn") }}
+            </router-link>
           </li>
           <li v-if="!isLoggedIn" class="nav-item">
-            <router-link class="nav-link mx-2" to="/register"
-              >Sign Up</router-link
-            >
+            <router-link class="nav-link mx-2" to="/register">
+              {{ $t("navbar.signUp") }}
+            </router-link>
           </li>
           <li v-if="isLoggedIn" class="nav-item dropdown">
             <a
@@ -78,14 +79,14 @@
               aria-labelledby="accountDropdown"
             >
               <li>
-                <router-link class="dropdown-item" to="/profile"
-                  >Profile</router-link
-                >
+                <router-link class="dropdown-item" to="/profile">
+                  {{ $t("navbar.profile") }}
+                </router-link>
               </li>
               <li>
-                <a class="dropdown-item" href="#" @click.prevent="logout"
-                  >Logout</a
-                >
+                <a class="dropdown-item" href="#" @click.prevent="logout">
+                  {{ $t("navbar.logout") }}
+                </a>
               </li>
             </ul>
           </li>
@@ -109,7 +110,6 @@
               aria-expanded="false"
             >
               {{ currencySymbol(currencyStore.currentCurrency) }}
-              <!-- Display Current Currency -->
             </a>
             <ul
               class="dropdown-menu dropdown-menu-end"
@@ -154,7 +154,6 @@
               aria-expanded="false"
             >
               <span :class="currentFlag"></span>
-              <!-- Default Flag Icon -->
             </a>
             <ul
               class="dropdown-menu dropdown-menu-end"
@@ -197,19 +196,18 @@
 
 <script setup>
 import { useCurrencyStore } from "@/stores/currencyStore";
-import { ref, onMounted, computed } from "vue";
-import { useI18n } from "vue-i18n";
+import { onMounted, computed } from "vue";
+import { useLanguageStore } from "@/stores/languageStore";
 import { useAuthStore } from "@/stores/authStore";
 import PAGES from "@/constants/pages";
 
+const languageStore = useLanguageStore();
 const currencyStore = useCurrencyStore();
-const { locale } = useI18n();
 const authStore = useAuthStore();
-const currentFlag = ref("fi fi-us");
 const isLoggedIn = computed(() => authStore.isAuthenticated);
 const currentMode = computed(() => authStore.mode);
+const currentFlag = computed(() => languageStore.currentFlag);
 
-// Computed properties for link and text
 const hostLink = computed(() => {
   if (!isLoggedIn.value) return PAGES.LOGIN;
   return currentMode.value;
@@ -222,7 +220,6 @@ const hostText = computed(() => {
     : "Switch to hosting";
 });
 
-// Function to toggle the mode
 function handleHostClick() {
   if (isLoggedIn.value) {
     authStore.toggleMode();
@@ -230,10 +227,7 @@ function handleHostClick() {
 }
 
 function switchLanguage(lang, flagClass) {
-  locale.value = lang;
-  currentFlag.value = flagClass;
-  localStorage.setItem("selectedLanguage", lang);
-  localStorage.setItem("selectedFlag", flagClass);
+  languageStore.switchLanguage(lang, flagClass);
 }
 
 const switchCurrency = (currency) => {
@@ -249,43 +243,24 @@ const currencySymbol = (currency) => {
   return symbols[currency] || currency;
 };
 
-// Function to handle user logout
 function logout() {
   authStore.logout();
 }
 
-// Function to initialize local storage values
 function initializeLocalStorage() {
-  if (!localStorage.getItem("selectedLanguage")) {
-    localStorage.setItem("selectedLanguage", "en");
-  }
-  if (!localStorage.getItem("selectedFlag")) {
-    localStorage.setItem("selectedFlag", "fi fi-us");
-  }
   if (!localStorage.getItem("selectedCurrency")) {
-    localStorage.setItem("selectedCurrency", "VND"); // Default currency
+    localStorage.setItem("selectedCurrency", "VND");
   }
 }
 
 onMounted(() => {
   initializeLocalStorage();
 
-  const savedLanguage = localStorage.getItem("selectedLanguage");
-  const savedFlag = localStorage.getItem("selectedFlag");
   const savedCurrency = localStorage.getItem("selectedCurrency");
-
-  if (savedLanguage) {
-    locale.value = savedLanguage;
-  }
-  if (savedFlag) {
-    currentFlag.value = savedFlag;
-  }
-
   if (savedCurrency) {
-    currencyStore.setCurrency(savedCurrency); // Use store's setter method to update the currency
+    currencyStore.setCurrency(savedCurrency);
   }
 
-  // Ensure that the user's role and mode are initialized from local storage
   const savedRole = localStorage.getItem("userRole");
   if (savedRole) {
     authStore.userRole = savedRole;
@@ -310,13 +285,13 @@ onMounted(() => {
 }
 
 .nav-link {
-  font-size: 1.2rem; /* Adjust the font size as needed */
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
 }
 
 .dropdown-menu {
-  min-width: 150px; /* Adjust the width as needed */
+  min-width: 150px;
 }
 
 .rounded-circle {
@@ -324,7 +299,7 @@ onMounted(() => {
 }
 
 .profile-icon {
-  margin-left: 10px; /* Adjust margin to move icon to the right */
+  margin-left: 10px;
 }
 
 .currency {
