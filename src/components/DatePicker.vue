@@ -17,20 +17,21 @@
           v-for="(day, index) in daysInMonth"
           :key="index"
           class="day"
+          :style="{ cursor: !disabled ? 'pointer' : 'default' }"
           :class="{
             selected: isSelected(day),
             disabled: isDisabled(day).isDisabled && !isDisabled(day).isLocked,
             locked: isDisabled(day).isLocked,
             unlocking: isUnlocking(day),
           }"
-          @click="disabled ? toggleDate(day) : null"
+          @click="!disabled ? toggleDate(day) : null"
           :disabled="isDisabled(day)"
         >
           {{ day }}
         </div>
       </div>
     </div>
-    <div v-if="disabled" class="button-container">
+    <div v-if="!disabled" class="button-container">
       <button  @click="lockDates" class="lock-button">Lock</button>
       <button @click="unlockDates" class="unlock-button">Unlock</button>
       <button @click="close" class="close-button">Close</button>
@@ -53,7 +54,7 @@ const props = defineProps({
   },
   homestayId: {
     type: Number,
-    required: true,
+    required: false,
   },
   disabled: {
     type: Boolean,
@@ -301,7 +302,6 @@ const close = () => {
 .day {
   padding: 10px;
   text-align: center;
-  cursor: pointer;
   border-radius: 5px;
 }
 

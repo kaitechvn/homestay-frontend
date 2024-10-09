@@ -88,8 +88,8 @@
                   />
                 </button>
                 <button
-                  v-if="!booking.is_review"
-                  @click="makeReview(booking.bookingId)"
+                  v-if="!booking.isReview"
+                  @click="openReviewModal(booking)"
                   title="Review"
                 >
                   <img
@@ -98,6 +98,7 @@
                     class="action-icon"
                   />
                 </button>
+                <span v-else>Rated</span>
               </span>
 
               <span v-if="booking.status === 'PENDING'">
@@ -112,7 +113,9 @@
                   />
                 </button>
                 <button
-                  @click="processPayment(booking.totalAmount, booking.bookingId)"
+                  @click="
+                    processPayment(booking.totalAmount, booking.bookingId)
+                  "
                   title="Process Payment"
                 >
                   <img
@@ -134,6 +137,13 @@
         @onClose="closeModal"
       />
 
+      <ReviewModal
+        v-if="isReviewModalVisible"
+        :homestayId="propBooking.homestayId"
+        :bookingId="propBooking.bookingId"
+        @close="closeReviewModal"
+      />
+
       <pagination
         :current-page="currentPage"
         :total-pages="totalPages"
@@ -144,14 +154,17 @@
 </template>
   
 <script setup>
-import { useLanguageStore } from "@/stores/languageStore"; // Import your language store
+import { useLanguageStore } from "@/stores/languageStore";
 import { ref, computed, onMounted } from "vue";
 import { useBookingUserStore } from "@/stores/bookingUserStore";
 import Pagination from "@/components/Pagination.vue";
 import ContactModal from "@/components/booking/ContactModal.vue";
+import ReviewModal from "@/components/ReviewModal.vue";
 import { downloadPdfBill } from "@/services/pdfService";
 import { createVnPayPayment } from "@/services/paymentService";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const bookingStore = useBookingUserStore();
 const bookings = computed(() => bookingStore.bookings);
 const currentPage = computed(() => bookingStore.currentPage);
@@ -196,7 +209,18 @@ const processPayment = async (amount, bookingId) => {
   }
 };
 
+const isReviewModalVisible = ref(false);
 const isModalVisible = ref(false);
+
+const openReviewModal = (booking) => {
+  setSelectedBooking(booking);
+  isReviewModalVisible.value = true;
+};
+
+const closeReviewModal = () => {
+  isReviewModalVisible.value = false;
+  clearSelectedBooking();
+};
 
 const showModal = (booking) => {
   setSelectedBooking(booking);
@@ -209,9 +233,13 @@ const closeModal = () => {
 };
 
 onMounted(async () => {
-  const savedPage = localStorage.getItem("currentPage");
-  const pageToLoad = savedPage ? parseInt(savedPage, 10) : 1;
-  await loadBookings(pageToLoad);
+  const pageToLoad = route.query.page
+    ? parseInt(route.query.page, 10)
+    : localStorage.getItem("currentPage")
+    ? parseInt(localStorage.getItem("currentPage"), 10)
+    : 1;
+
+  await loadBookings(pageToLoad, 5);
 });
 </script>
   

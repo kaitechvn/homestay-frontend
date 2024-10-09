@@ -17,6 +17,7 @@ import BookingManagement from "@/pages/admin/BookingManagement.vue";
 import BookingSuccess from "@/components/booking/BookingSuccess.vue";
 import PaymentFailed from "@/components/booking/PaymentFailed.vue";
 import Booking from "@/pages/user/Booking.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 const routes = [
 
@@ -47,7 +48,6 @@ const routes = [
   { path: PAGES.USER.BOOKING_SUCCESS, component: BookingSuccess},
   { path: PAGES.USER.PAYMENT_FAILED, component: PaymentFailed},
 
-  // Catch-all route for undefined paths
   {
     path: "/:catchAll(.*)", 
     component: NotFound
@@ -60,11 +60,22 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition; // Scroll to saved position (for browser's forward/back buttons)
+      return savedPosition; 
     } else {
-      return { top: 0 }; // Always scroll to the top
+      return { top: 0 }; 
     }
   },
+});
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const isAuthenticated = authStore.isAuthenticated; 
+
+  if (isAuthenticated && (to.path === PAGES.LOGIN || to.path === PAGES.REGISTER)) {
+    next({ path: PAGES.HOME }); 
+  } else {
+    next(); 
+  }
 });
 
 export default router;

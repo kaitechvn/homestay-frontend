@@ -56,16 +56,13 @@ axiosInstance.interceptors.response.use(
 
         const accessToken = refreshResponse.data.data.accessToken;
 
-        // Store the new tokens
         localStorage.setItem('access_token', accessToken);
         localStorage.setItem('refresh_token', refreshToken);
 
-        // Update the axios instance default header
         axiosInstance.defaults.headers.common[
           'Authorization'
         ] = `Bearer ${accessToken}`;
 
-        // Retry the original request
         const { config } = error;
         config.headers.Authorization = `Bearer ${accessToken}`;
         return axiosInstance.request(config);
@@ -75,8 +72,7 @@ axiosInstance.interceptors.response.use(
         const authStore = useAuthStore();
         console.log('Error token refresh:', refreshError);
 
-        // Call the logout method from your authStore
-        authStore.logout(); // Assuming authStore is properly imported or accessible here
+        authStore.logout(); 
       }
     }
     return Promise.reject(error);

@@ -50,13 +50,13 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('userRole');
-      localStorage.removeItem('mode'); // Optional: clear mode on logout
+      localStorage.removeItem('mode'); 
       localStorage.removeItem('currentPage')
 
       delete axiosInstance.defaults.headers.common['Authorization'];
 
       userRole.value = null;
-      mode.value = PAGES.HOST.HOME; // Reset mode to default
+      mode.value = PAGES.HOST.HOME; 
 
       router.push('/login');
     }

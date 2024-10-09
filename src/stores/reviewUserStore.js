@@ -19,7 +19,6 @@ export const useReviewUserStore = defineStore('reviewUser', {
     async submitReview(reviewData) {
       try {
         await addReview(reviewData);
-        await this.loadReviews(reviewData.homestayId);
       } catch (err) {
         console.error('Failed to add review', err);
       }

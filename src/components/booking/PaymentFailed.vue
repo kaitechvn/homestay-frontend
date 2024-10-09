@@ -34,12 +34,13 @@
 </template>
   
 <script setup>
+import { useBookingUserStore } from "@/stores/bookingUserStore";
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import PAGES from "@/constants/pages";
-import { cancelBooking } from "@/services/bookingService";
 import { createVnPayPayment } from "@/services/paymentService";
 
+const bookingUserStore = useBookingUserStore();
 const router = useRouter();
 const route = useRoute();
 const showModal = ref(false);
@@ -52,13 +53,15 @@ const goHome = () => {
 
 const cancel = () => {
   // Call API to cancel the booking
-  cancelBooking(bookingId)
+  bookingUserStore.cancel(bookingId)
     .then(() => {
-      // Show success message
       alert("Booking has been canceled successfully.");
 
       setTimeout(() => {
-        router.push(PAGES.USER.BOOKING);
+        router.push({
+          path: PAGES.USER.BOOKING,
+          query: { page: 1 }
+        });
       }, 2000);
     })
     .catch((error) => {
@@ -66,6 +69,7 @@ const cancel = () => {
       alert("Something went wrong. Please try again.");
     });
 };
+
 
 const showPaymentMethods = () => {
   showModal.value = true;

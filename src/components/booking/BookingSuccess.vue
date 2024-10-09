@@ -2,39 +2,49 @@
   <div class="booking-success">
     <div class="success-message">
       <!-- Success Icon/Illustration -->
-      <img src="@/assets/success-icon.svg" alt="Booking Success" class="success-icon" />
+      <img
+        src="@/assets/success-icon.svg"
+        alt="Booking Success"
+        class="success-icon"
+      />
 
       <!-- Success Text -->
       <h1>Booking Confirmed!</h1>
       <p>
-        Your booking has been successfully confirmed.
-        Thank you for trusting our homestay booking service!
+        Your booking has been successfully confirmed. Thank you for trusting our
+        homestay booking service!
       </p>
 
       <!-- Buttons for Navigation -->
       <div class="button-group">
-        <button @click="goToHome" class="btn btn-primary">Return to Home</button>
-        <button @click="goToBookingHistory" class="btn btn-secondary">View Booking History</button>
+        <button @click="goToHome" class="btn btn-primary">
+          Return to Home
+        </button>
+        <button @click="goToBookingHistory(1)" class="btn btn-secondary">
+          View Booking History
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-import PAGES from '@/constants/pages';
+import { useRouter } from "vue-router";
+import PAGES from "@/constants/pages";
 
 const router = useRouter();
 
-// Redirect to homepage
 const goToHome = () => {
   router.push({ path: PAGES.HOME });
 };
 
-// Redirect to booking history page
-const goToBookingHistory = () => {
-  router.push({ path: PAGES.USER.BOOKING});
+const goToBookingHistory = (page) => {
+  router.push({
+    path: PAGES.USER.BOOKING,
+    query: { page }, 
+  });
 };
+
 </script>
 
 <style scoped>

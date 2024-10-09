@@ -32,16 +32,13 @@
     <div class="button-container">
       <button v-if="canLoadMore" @click="loadMoreReviews">Load More</button>
     </div>
-
   </div>
-
-  
 </template>
   
-  <script setup>
+<script setup>
 import { computed, onMounted, ref } from "vue";
 import { useReviewUserStore } from "@/stores/reviewUserStore";
-import defaultAvatar from "@/assets/avataruser.png"; // Import your local default avatar
+import defaultAvatar from "@/assets/avataruser.png";
 
 // Props
 const props = defineProps({
@@ -56,31 +53,28 @@ const reviewUserStore = useReviewUserStore();
 const { loadReviews } = reviewUserStore;
 
 // State
-const allReviews = ref([]); // Store all fetched reviews
-const displayedReviews = ref([]); // Store only the reviews to display
-const pageSize = 3; // Number of reviews to show at once
-const currentPage = ref(0); // Track the current page for loading more reviews
+const allReviews = ref([]);
+const displayedReviews = ref([]);
+const pageSize = 3;
+const currentPage = ref(0);
 
-// Fetch reviews on mount
 onMounted(async () => {
   await loadInitialReviews();
 });
 
-// Load initial reviews
 const loadInitialReviews = async () => {
   await loadReviews(props.homestayId);
-  allReviews.value = reviewUserStore.reviews; 
-  loadMoreReviews(); 
+  allReviews.value = reviewUserStore.reviews;
+  loadMoreReviews();
 };
 
-// Load more reviews function
 const loadMoreReviews = () => {
   const nextReviews = allReviews.value.slice(
     currentPage.value * pageSize,
     (currentPage.value + 1) * pageSize
   );
-  displayedReviews.value.push(...nextReviews); 
-  currentPage.value++; 
+  displayedReviews.value.push(...nextReviews);
+  currentPage.value++;
 };
 
 const canLoadMore = computed(
@@ -91,9 +85,27 @@ const formatDate = (dateString) => {
   const options = { year: "numeric", month: "long", day: "numeric" };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
+
+const review = async () => {
+  // Call your API to submit the review
+  await submitReview({
+    bookingId: props.bookingId,
+    rating: rating.value,
+    comment: comment.value,
+  });
+
+  rating.value = null;
+  comment.value = "";
+
+  emit("close");
+};
+
+const emitClose = () => {
+  emit("close");
+};
 </script>
   
-  <style scoped>
+<style scoped>
 .reviews-section {
   margin: 20px 0;
 }
@@ -158,7 +170,7 @@ ul {
 
 .button-container {
   display: flex;
-  justify-content: center; /* Center horizontally */
+  justify-content: center; 
 }
 
 button {
@@ -173,5 +185,6 @@ button {
 button:hover {
   background-color: #a27056;
 }
+
+
 </style>
-  

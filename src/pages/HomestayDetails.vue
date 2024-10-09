@@ -77,10 +77,14 @@
         </ul>
       </div>
 
+      <div v-if="homestay.id">
+        <DatePicker :disabled="true" :locked-dates="lockDates"></DatePicker>
+      </div>
       
       <div v-if="homestay.id">
         <Review :homestayId="homestay.id" />
       </div>
+
     </div>
 
     <!-- Payment Section -->
@@ -122,7 +126,6 @@
         <input type="date" v-model="checkin" id="checkin" class="input-field" />
       </div>
 
-      <!-- Check-out Input -->
       <div class="form-group">
         <label for="checkout">Check-out:</label>
         <input
@@ -188,7 +191,9 @@ import { useHomestayUserStore } from "@/stores/homestayUserStore";
 import BookingModal from "@/components/booking/BookingModal.vue";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { fetchExchangeRate, formattedPrice } from "@/utils/currencyUtils";
+import DatePicker from "@/components/DatePicker.vue";
 import Review from "@/components/Review.vue";
+import { fetchLockDates } from "@/services/homestayService";
 
 const currencyStore = useCurrencyStore();
 const exchangeRate = ref(0);
@@ -207,6 +212,8 @@ onMounted(async () => {
   try {
     await fetchHomestayDetail(homestayId);
     currentImage.value = store.homestayDetail.images[0] || {};
+    lockDates.value = await loadLockDates();
+    console.log(lockDates.value);
     getExchangeRate();
   } catch (error) {
     console.error("Failed to fetch homestay details:", error);
@@ -234,7 +241,6 @@ const setCurrentImage = (image) => {
 const startIndex = ref(0); // Track the starting index for visible images
 const visibleThumbnailsCount = 5; // Number of thumbnails to display at a time
 
-// Function to go to the next image in the current displayed images or move to the next set of images
 const nextImage = () => {
   const currentImageIndex = homestay.value.images.findIndex(
     (image) => image.url === currentImage.value.url
@@ -340,6 +346,20 @@ const priceFormatter = (price) => {
     currencyStore.currentCurrency,
     exchangeRate.value
   );
+};
+
+const lockDates = ref([]); // Initialize the lock dates array
+
+// Function to load lock dates for the specified homestay ID
+const loadLockDates = async () => {
+  try {
+    const response = await fetchLockDates(homestayId);
+    const data = await response.data;
+    return data; 
+  } catch (error) {
+    console.error('Error loading lock dates:', error);
+    return []; 
+  }
 };
 </script>
 

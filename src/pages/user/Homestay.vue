@@ -207,7 +207,8 @@
   <Pagination
     :currentPage="currentPage"
     :totalPages="totalPages"
-    @page-changed="loadHomestays"
+    @page-changed="filterStoreHomestays"
+    @scroll-to-parent="scrollToParent"
   />
 </template>
 
@@ -236,14 +237,12 @@ const currentPage = computed(() => homestayUserStore.currentPage);
 const totalPages = computed(() => homestayUserStore.totalPages);
 const homestays = computed(() => homestayUserStore.homestays);
 const selectedHomestay = computed(() => homestayUserStore.selectedHomestay);
-const { filterHomestays, setSelectedHomestay, clearSelectedHomestay } =
+const { filterStoreHomestays, setSelectedHomestay, clearSelectedHomestay } =
   homestayUserStore;
 
 const districtId = ref(DISTRICTS);
 
 const filters = ref({
-  page: 1,
-  size: 5,
   minPrice: "",
   maxPrice: "",
   guests: "",
@@ -255,13 +254,13 @@ const filters = ref({
 const homestayList = ref(null);
 
 onMounted(async () => {
-  await filterHomestays(filters.value);
+  await filterStoreHomestays(1, filters.value);
   getExchangeRate();
 });
 
 const searchHomestays = () => {
   homestayUserStore.filters = { ...filters.value };
-  filterHomestays(homestayUserStore.filters);
+  filterStoreHomestays(1, homestayUserStore.filters);
 
   if (homestayList.value) {
     homestayList.value.scrollIntoView({ behavior: "smooth" });
@@ -276,10 +275,9 @@ const resetFilters = () => {
     checkIn: "",
     checkOut: "",
     districtId: "",
-    rating: "",
   };
   homestayUserStore.filters = { ...filters.value };
-  filterHomestays(homestayUserStore.filters);
+  filterStoreHomestays(1, homestayUserStore.filters);
 };
 
 const priceFormatter = (price) => {
@@ -306,11 +304,6 @@ const viewDetails = (homestay) => {
   router.push({ name: "HomestayDetail", params: { id: homestay.id } });
 };
 
-const loadHomestays = (newPage) => {
-  filters.value.page = newPage;
-  filterHomestays(filters.value);
-};
-
 function openMap(homestay) {
   const location = encodeURIComponent(`${homestay.name} ${homestay.address}`);
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${location}`;
@@ -332,6 +325,17 @@ const updatePriceRange = () => {
   } else {
     filters.value.minPrice = null;
     filters.value.maxPrice = null;
+  }
+};
+
+const scrollToParent = () => {
+  // Accessing the DOM reference and scrolling
+  const parentComponent = document.querySelector(".homestay-list");
+  if (parentComponent) {
+    parentComponent.scrollIntoView({
+      behavior: "smooth", 
+      block: "start", 
+    });
   }
 };
 </script>
@@ -476,7 +480,7 @@ const updatePriceRange = () => {
 .homestay-info {
   display: flex;
   flex-direction: column; /* Stack details vertically */
-  width: 350px; /* Set a fixed width for the homestay-info section (adjust as needed) */
+  width: 330px;
 }
 
 .homestay-name {
@@ -553,11 +557,12 @@ const updatePriceRange = () => {
 }
 
 .homestay-description {
-  max-width: 500px; /* Set the maximum width for one line (adjust as needed) */
-  white-space: normal; /* Allow text to wrap normally */
-  overflow-wrap: break-word; /* Allow long words to break and wrap onto the next line */
-  line-height: 1.5; /* Optional: Adjust line height for better readability */
-  font-size: 0.89em; /* Adjust size as needed */
+  max-width: 500px;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.5;
+  font-size: 0.89em;
+  margin-left: 9px;
 }
 
 .button-container {

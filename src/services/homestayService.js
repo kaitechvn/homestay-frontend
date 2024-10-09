@@ -1,6 +1,5 @@
 import axiosInstance from '@/plugins/axios';
-
-const API_HOMESTAY = '/homestays'; 
+const API_HOMESTAY = '/homestays';
 
 export const fetchHomestays = (page = 1, size = 5) => {
   return axiosInstance.get(API_HOMESTAY, {
@@ -9,13 +8,12 @@ export const fetchHomestays = (page = 1, size = 5) => {
 };
 
 export const fetchHomestayDetailById = async (homestayId) => {
-  // Make an API call to fetch the homestay detail by ID
   return axiosInstance.get(`${API_HOMESTAY}/${homestayId}`);
-  
 };
-export const filterHomestays = (filters) => {
+
+export const filterHomestays = (params) => {
   return axiosInstance.get(`${API_HOMESTAY}/filter`, {
-    params: filters,
+    params,
   });
 };
 

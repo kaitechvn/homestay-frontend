@@ -1,35 +1,37 @@
 <template>
   <div class="pagination-container">
-    <button 
-      class="btn btn-primary" 
-      @click="goToPreviousPage" 
-      :disabled="currentPage === 1">
+    <button
+      class="btn btn-primary"
+      @click="goToPreviousPage"
+      :disabled="currentPage === 1"
+    >
       Previous
     </button>
 
     <div class="pagination-box">
-      <input 
-        type="number" 
-        v-model.number="inputPage" 
-        @keyup.enter="goToPage(inputPage)" 
-        :min="1" 
+      <input
+        type="number"
+        v-model.number="inputPage"
+        @keyup.enter="goToPage(inputPage)"
+        :min="1"
         :max="totalPages"
         class="page-input"
       />
       <span>/ {{ totalPages }}</span>
     </div>
 
-    <button 
-      class="btn btn-primary" 
-      @click="goToNextPage" 
-      :disabled="currentPage === totalPages">
+    <button
+      class="btn btn-primary"
+      @click="goToNextPage"
+      :disabled="currentPage === totalPages"
+    >
       Next
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
 const props = defineProps({
   currentPage: {
@@ -39,35 +41,42 @@ const props = defineProps({
   totalPages: {
     type: Number,
     required: true,
-  }
+  },
 });
 
-const emit = defineEmits(['page-changed']);
+const emit = defineEmits(["page-changed","scroll-to-parent"]);
 const inputPage = ref(props.currentPage);
 
-watch(() => props.currentPage, (newVal) => {
-  inputPage.value = newVal; // Sync input field with the current page
-});
+watch(
+  () => props.currentPage,
+  (newVal) => {
+    inputPage.value = newVal;
+  }
+);
 
 const goToPage = (page) => {
   if (page >= 1 && page <= props.totalPages) {
-    emit('page-changed', page);
+    emit("page-changed", page);
   } else {
-    inputPage.value = props.currentPage; // Reset input if invalid
+    inputPage.value = props.currentPage;
   }
 };
 
 const goToPreviousPage = () => {
   if (props.currentPage > 1) {
-    emit('page-changed', props.currentPage - 1);
+    emit("page-changed", props.currentPage - 1);
+    emit("scroll-to-parent"); 
   }
 };
 
 const goToNextPage = () => {
   if (props.currentPage < props.totalPages) {
-    emit('page-changed', props.currentPage + 1);
+    emit("page-changed", props.currentPage + 1);
+    emit("scroll-to-parent"); 
   }
 };
+
+
 </script>
 
 <style scoped>

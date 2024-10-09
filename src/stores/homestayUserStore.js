@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
-import { filterHomestays, fetchTopRatedHomestays, fetchHomestayDetailById } from '@/services/homestayService';
+import {
+  filterHomestays,
+  fetchTopRatedHomestays,
+  fetchHomestayDetailById,
+  fetchHomestays,
+} from '@/services/homestayService';
 
 export const useHomestayUserStore = defineStore('homestayUser', {
   state: () => ({
@@ -9,8 +14,6 @@ export const useHomestayUserStore = defineStore('homestayUser', {
     totalPages: 1,
     currentPage: 1,
     filters: {
-      page: 1,
-      size: 5,
       districtId: null,
       minPrice: null,
       maxPrice: null,
@@ -18,16 +21,22 @@ export const useHomestayUserStore = defineStore('homestayUser', {
       checkIn: null,
       checkOut: null,
     },
-    homestayDetail: {}, 
+    homestayDetail: {},
   }),
 
   actions: {
-    async filterHomestays(filters) {
+    async filterStoreHomestays(page = 1, filter = this.filters, size = 5) {
       try {
-        const response = await filterHomestays(filters);
+        // Prepare the parameters
+        const params = {
+          ...filter, 
+          page: page, 
+          size: size, 
+        };
+
+        const response = await filterHomestays(params);
 
         this.homestays = response.data.data.data;
-        console.log('Homestays user set in store:', this.homestays);
         this.currentPage = response.data.data.currentPage;
         this.totalPages = response.data.data.totalPages;
       } catch (error) {
@@ -39,7 +48,7 @@ export const useHomestayUserStore = defineStore('homestayUser', {
       if (this.topRatedHomestays.length === 0) {
         try {
           const response = await fetchTopRatedHomestays();
-          this.topRatedHomestays = response.data; 
+          this.topRatedHomestays = response.data;
         } catch (error) {
           console.error('Error fetching top-rated homestays:', error);
         }
@@ -57,7 +66,7 @@ export const useHomestayUserStore = defineStore('homestayUser', {
     },
 
     setSelectedHomestay(homestay) {
-      this.selectedHomestay = homestay; 
+      this.selectedHomestay = homestay;
     },
   },
 
@@ -80,5 +89,4 @@ export const useHomestayUserStore = defineStore('homestayUser', {
   getImagesForHomestay(homestayId) {
     return this.homestayImages[homestayId] || [];
   },
-
 });

@@ -12,9 +12,8 @@ export const useUserStore = defineStore('user', {
     async loadUsers(page = 1, size = 5) {
         try {
           const response = await fetchUsers(page, size);
-          console.log(response.data); // Log the response for debugging
+          console.log(response.data); 
       
-          // Extract users and pagination info
           this.users = response.data.data.data; 
           this.currentPage = response.data.data.currentPage;
           this.totalPages = response.data.data.totalPages;

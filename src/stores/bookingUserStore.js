@@ -27,8 +27,8 @@ export const useBookingUserStore = defineStore('bookingUser', {
     async cancel(bookingId) {
       try {
         await cancelBooking(bookingId);
-        this.loadBookings(this.currentPage);
-        // this.selectedBooking = null;
+        this.loadBookings();
+        this.selectedStatus = null;
       } catch (error) {
         console.error('Failed to cancel booking', error);
       }
